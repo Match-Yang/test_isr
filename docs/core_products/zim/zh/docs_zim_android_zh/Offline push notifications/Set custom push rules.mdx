@@ -1,0 +1,75 @@
+---
+articleID: 19213
+---
+
+# 自定义推送规则
+
+import Content from '/core_products/zim/zh/snippets/CustomPushRulesIntro.mdx'
+
+<Content />
+
+
+## 实现流程
+
+### 用户离线推送规则变化通知
+
+如需用户自定义规则时收到通知，请重写 [ZIMEventHandler](@-ZIMEventHandler) 对象中的 [onUserRuleUpdated](@onUserRuleUpdated) 方法实现。
+
+```java
+// 监听用户自定义规则
+@Override
+public void onUserRuleUpdated(ZIM zim, ZIMUserRule rule) {
+    // 离线推送规则
+    userRule.offlinePushRule;
+}
+```
+
+
+### 设置离线推送规则
+
+如需支持用户自定义推送规则时，开发者需要构造 [ZIMUserOfflinePushRule](@-ZIMUserOfflinePushRule)，规定用户在哪些平台上在线（[onlinePlatforms](@onlinePlatforms)）时，哪些平台无需接收离线推送（[notToReceiveOfflinePushPlatforms](@notToReceiveOfflinePushPlatforms)）。
+
+调用 [updateUserOfflinePushRule](@updateUserOfflinePushRule) 接口，设置上述规则。
+
+```java
+// 设置离线推送规则
+
+// 构造 ZIMUserOfflinePushRule
+ArrayList<Integer> onlinePlatforms = new ArrayList<>();
+
+// 当用户 win、MacOS、Linux 平台登录时
+ArrayList<Integer> onlinePlatforms = new ArrayList<>();
+onlinePlatforms.add(ZIMPlatformType.WIN.value());
+onlinePlatforms.add(ZIMPlatformType.MAC_OS.value());
+onlinePlatforms.add(ZIMPlatformType.LINUX.value());
+offlineRule.setOnlinePlatforms(onlinePlatforms);
+
+// 用户在 iPhoneOS、iPadOS、Android 上不收到离线推送
+ArrayList<Integer> notToReceiveOfflinePushPlatforms = new ArrayList<>();
+notToReceiveOfflinePushPlatforms.add(ZIMPlatformType.IPHONE_OS.value());
+notToReceiveOfflinePushPlatforms.add(ZIMPlatformType.IPAD_OS.value());
+notToReceiveOfflinePushPlatforms.add(ZIMPlatformType.ANDROID.value());
+offlineRule.setNotToReceiveOfflinePushPlatforms(notToReceiveOfflinePushPlatforms);
+
+// 调用 updateUserOfflinePushRule 方法
+ZIM.getInstance().updateUserOfflinePushRule(offlineRule, new ZIMUserOfflinePushRuleUpdatedCallback() {
+    @Override
+    public void onUserOfflinePushRuleUpdated(ZIMUserOfflinePushRule updatedOfflinePushRule, ZIMError errorInfo) {
+    }
+});
+```
+
+### 查询用户定义的推送规则
+
+通过调用 [querySelfUserInfo](@querySelfUserInfo)，即可在回调中的 `selfUserInfo.userRule.offlinePushRule` 获取当前用户自定义的离线推送规则。
+
+```java 
+ZIM.getInstance().querySelfUserInfo(new ZIMSelfUserInfoQueriedCallback() {
+    @Override
+    public void onSelfUserInfoQueried(ZIMSelfUserInfo selfUserInfo, ZIMError errorInfo) {
+         selfUserInfo.userRule.offlinePushRule; // 当前用户定义的离线推送规则
+        
+    }
+});
+```
+

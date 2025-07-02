@@ -1,0 +1,301 @@
+# Event
+
+
+
+## Invitation Events
+
+
+### onIncomingCallDeclineButtonPressed
+
+This callback will be triggered to **callee** when callee clicks the decline button in an incoming call.
+
+<CodeGroup>
+```js Prototype
+onIncomingCallDeclineButtonPressed(navigation)
+```
+
+```js Example
+return ZegoUIKitPrebuiltCallService.init(
+  Your_APPID,
+  Your_APPSign,
+  Your_UserID,
+  Your_UserName,
+  [ZIM, ZPNs],
+  {
+    onIncomingCallDeclineButtonPressed: (navigation) => {
+      //...
+    },
+  }
+);
+```
+</CodeGroup>
+
+
+### onIncomingCallAcceptButtonPressed
+
+This callback will be triggered to **callee** when callee clicks the accept button in an incoming call.
+
+<CodeGroup>
+```js Prototype
+onIncomingCallAcceptButtonPressed(navigation)
+```
+
+```js Example
+return ZegoUIKitPrebuiltCallService.init(
+  Your_APPID,
+  Your_APPSign,
+  Your_UserID,
+  Your_UserName,
+  [ZIM, ZPNs],
+  {
+    onIncomingCallAcceptButtonPressed: (navigation) => {
+      //...
+    },
+  }
+);
+```
+</CodeGroup>
+
+
+### onOutgoingCallCancelButtonPressed
+
+This callback will be triggered to **caller** when the caller cancels the call invitation by clicking the cancel button.
+
+<CodeGroup>
+```js Prototype
+onOutgoingCallCancelButtonPressed(navigation, callID, invitees, type)
+```
+
+```js Example
+return ZegoUIKitPrebuiltCallService.init(
+  Your_APPID,
+  Your_APPSign,
+  Your_UserID,
+  Your_UserName,
+  [ZIM, ZPNs],
+  {
+    onOutgoingCallCancelButtonPressed: (navigation, callID, invitees, type) => {
+      //...
+    },
+  }
+);
+```
+</CodeGroup>
+
+
+### onIncomingCallReceived
+
+This callback will be triggered to **callee** when callee receives a call.
+
+<CodeGroup>
+```js Prototype
+onIncomingCallReceived(callID, inviter, type, invitees, customData)
+```
+
+```js Example
+return ZegoUIKitPrebuiltCallService.init(
+  Your_APPID,
+  Your_APPSign,
+  Your_UserID,
+  Your_UserName,
+  [ZIM, ZPNs],
+  {
+    onIncomingCallReceived: (callID, inviter, type, invitees, customData) => {
+      //...
+    },
+  }
+);
+```
+</CodeGroup>
+
+
+### onIncomingCallCanceled
+
+This callback will be triggered to **callee** when the caller cancels the call invitation.
+
+<CodeGroup>
+```js Prototype
+onIncomingCallCanceled(callID, inviter)
+```
+
+```js Example
+return ZegoUIKitPrebuiltCallService.init(
+  Your_APPID,
+  Your_APPSign,
+  Your_UserID,
+  Your_UserName,
+  [ZIM, ZPNs],
+  {
+    onIncomingCallCanceled: (callID, inviter) => {
+      //...
+    },
+  }
+);
+```
+</CodeGroup>
+
+
+### onIncomingCallTimeout
+
+The **callee** will receive a notification through this callback when the callee doesn't respond to the call invitation after a timeout duration.
+
+<CodeGroup>
+```js Prototype
+onIncomingCallTimeout(callID, inviter)
+```
+
+```js Example
+return ZegoUIKitPrebuiltCallService.init(
+  Your_APPID,
+  Your_APPSign,
+  Your_UserID,
+  Your_UserName,
+  [ZIM, ZPNs],
+  {
+    onIncomingCallTimeout: (callID, inviter) => {
+      //...
+    },
+  }
+);
+```
+</CodeGroup>
+
+
+### onOutgoingCallAccepted
+
+The **caller** will receive a notification through this callback when the callee accepts the call invitation.
+
+<CodeGroup>
+```js Prototype
+onOutgoingCallAccepted(callID, invitee)
+```
+
+```js Example
+return ZegoUIKitPrebuiltCallService.init(
+  Your_APPID,
+  Your_APPSign,
+  Your_UserID,
+  Your_UserName,
+  [ZIM, ZPNs],
+  {
+    onOutgoingCallAccepted: (callID, invitee) => {
+      //...
+    },
+  }
+);
+```
+</CodeGroup>
+
+
+### onOutgoingCallRejectedCauseBusy
+
+The **caller** will receive a notification through this callback when the callee rejects the call invitation (the callee is busy).
+
+<CodeGroup>
+```js Prototype
+onOutgoingCallRejectedCauseBusy(callID, invitee)
+```
+
+```js Example
+return ZegoUIKitPrebuiltCallService.init(
+  Your_APPID,
+  Your_APPSign,
+  Your_UserID,
+  Your_UserName,
+  [ZIM, ZPNs],
+  {
+    onOutgoingCallRejectedCauseBusy: (callID, invitee) => {
+      //...
+    },
+  }
+);
+```
+</CodeGroup>
+
+
+### onOutgoingCallDeclined
+
+The **caller** will receive a notification through this callback when the callee declines the call invitation actively.
+
+<CodeGroup>
+```js Prototype
+onOutgoingCallDeclined(callID, invitee)
+```
+
+```js Example
+return ZegoUIKitPrebuiltCallService.init(
+  Your_APPID,
+  Your_APPSign,
+  Your_UserID,
+  Your_UserName,
+  [ZIM, ZPNs],
+  {
+    onOutgoingCallDeclined: (callID, invitee) => {
+      //...
+    },
+  }
+);
+```
+</CodeGroup>
+
+
+### onOutgoingCallTimeout
+
+The **caller** will receive a notification through this callback when the call invitation didn't get responses after a timeout duration.
+
+<CodeGroup>
+```js Prototype
+onOutgoingCallTimeout(callID, invitees)
+```
+
+```js Example
+return ZegoUIKitPrebuiltCallService.init(
+  Your_APPID,
+  Your_APPSign,
+  Your_UserID,
+  Your_UserName,
+  [ZIM, ZPNs],
+  {
+    onOutgoingCallTimeout: (callID, invitees) => {
+      //...
+    },
+  }
+);
+```
+</CodeGroup>
+
+
+### onCallEnd
+
+User will receive this callback at the end of the call.
+
+The possible values for `reason` may be as follows:
+- 0: The call ended due to a local hang-up
+- 1: The call ended when the remote user hung up, leaving only one local user in the call
+- 2: The call ended due to being kicked out
+
+<CodeGroup>
+```js Prototype
+onCallEnd(callID, reason, duration)
+```
+
+```js Example
+return ZegoUIKitPrebuiltCallService.init(
+  Your_APPID,
+  Your_APPSign,
+  Your_UserID,
+  Your_UserName,
+  [ZIM, ZPNs],
+  {
+    requireConfig: (data) => {
+      return {
+        onCallEnd: (callID, reason, duration) => {
+          //...
+          props.navigation.navigate('HomeScreen');
+        }
+      }
+    }
+  }
+);
+```
+</CodeGroup>

@@ -1,0 +1,9 @@
+{
+    "mySidebar": [
+        {
+            "type": "doc",
+            "label": "术语说明",
+            "id": "term-explanation"
+        }
+    ]
+}

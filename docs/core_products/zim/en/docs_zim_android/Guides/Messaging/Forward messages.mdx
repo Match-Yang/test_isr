@@ -1,0 +1,385 @@
+---
+articleID: 17650
+---
+
+import { getPlatformData } from "/snippets/utils-content-parser.js"
+
+export const ZIMCombineMessageMap = {
+  'Android': <a href='@-ZIMCombineMessage' target='_blank'>ZIMCombineMessage</a>,
+  'Flutter': <a href='https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMCombineMessage-class.html' target='_blank'>ZIMCombineMessage</a>,
+}
+export const ZIMMessageArrayMap = {
+  'Android': <span>ArrayList &lt;<a href='@-ZIMMessage' target='_blank'>ZIMMessage</a>&gt;</span>,
+  'iOS': <span>NSArray &lt;<a href='@-ZIMMessage' target='_blank'>ZIMMessage*</a>&gt;*</span>,
+  'Flutter': <span>List &lt;<a href='https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMMessage-class.html' target='_blank'>ZIMMessage</a>&gt;*</span>,
+  'Web': <span><a href='@-ZIMMessage' target='_blank'>ZIMMessage</a>[]</span>,
+  'window': <span>std::vector &lt;<a href='@-ZIMMessage' target='_blank'>ZIMMessage</a>&gt;</span>,
+}
+export const sendMessageMap = {
+  'Android': <a href='@sendMessage' target='_blank'>sendMessage</a>,
+  'Flutter': <a href='https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/sendMessage.html' target='_blank'>sendMessage</a>,
+}
+export const queryCombineMessageDetailMap = {
+  'Android': <a href='@queryCombineMessageDetail' target='_blank'>queryCombineMessageDetail</a>,
+  'iOS': <a href='@queryCombineMessageDetailByMessage' target='_blank'>queryCombineMessageDetail</a>,
+  'Flutter': <a href='https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/queryCombineMessageDetail.html' target='_blank'>queryCombineMessageDetail</a>,
+}
+export const ZIMCombineMessageDetailQueriedCallbackMap = {
+  'Android': <a href='@-ZIMCombineMessageDetailQueriedCallback' target='_blank'>ZIMCombineMessageDetailQueriedCallback</a>,
+  'iOS': <a href='@ZIMCombineMessageDetailQueriedCallback' target='_blank'>ZIMCombineMessageDetailQueriedCallback</a>,
+  'Flutter': <a href='https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMCombineMessageDetailQueriedResult-class.html' target='_blank'>ZIMCombineMessageDetailQueriedCallback</a>,
+}
+export const typeMap = {
+  'Android,Flutter': 'String',
+  'window': 'std::string',
+  'iOS': 'NSString *',
+  "Web": "string",
+}
+
+# Forward messages
+
+- - -
+
+## Overview
+
+ZIM SDK supports two forms of message forwarding:
+- Forwarding combined messages.
+- Forwarding messages one by one.
+
+## Forwarding combined messages
+
+<Note title="Note">
+
+- Only ZIM SDK version 2.14.0 and above supports sending and receiving combined messages.
+- If the SDK version of the receiving end is between [2.0.0, 2.14.0), the receiving end can receive combined messages, but the message type will be displayed as unknown and the message content cannot be obtained. To obtain this message, please upgrade the SDK to version 2.14.0 or above.
+- If the SDK version of the receiving end is version 1.x.x, it cannot receive combined messages.
+</Note>
+
+<Frame width="60%" height="auto">
+  <img src="https://media-resource.spreading.io/docuo/workspace564/27e54a759d23575969552654cb45bf89/986142798f.png" alt="ZIMCombineMessage_en.png"/>
+</Frame>
+
+
+### Send combined messages
+
+The steps to send combined messages are as follows:
+
+1. Construct the combined message body using the {getPlatformData(props,ZIMCombineMessageMap)} object. The parameters include:
+
+| Parameter | Type | Required | Description |
+| ---- | ----| -------| -----|
+| title | {getPlatformData(props,typeMap)} | Yes | The title of the combined message, with a default maximum length of 20 bytes. If you need to configure it, please contact ZEGOCLOUD technical support.|
+| summary | {getPlatformData(props,typeMap)} | Yes | The summary of the combined message, with a default maximum length of 100 bytes. If you need to configure it, please contact ZEGOCLOUD technical support.|
+| messageList | {getPlatformData(props,ZIMMessageArrayMap)} | Yes | The original message list to be combined and forwarded. It does not support merging and forwarding messages of signaling, barrage, recall, and system types, and does not support merging and forwarding unsuccessful messages.|
+
+<Note title="Note">
+
+ZIM SDK supports including other combined messages in a combined message.
+</Note>
+
+2. Call the {getPlatformData(props,sendMessageMap)} interface to send the combined message. For more information about this operation, see [Send & Receive messages - Send messages](./Send%20and%20receive%20messages.mdx#send-rich-media-content).
+
+The following is an example code for a user to send a combined message in a one-on-one conversation:
+
+:::if{props.platform=undefined}
+```java
+// Send a combined message in a one-on-one conversation
+ZIMConversationType type = PEER; // Conversation type, value: one-on-one: 0, room: 1, group: 2
+ZIMMessageSendConfig config = new ZIMMessageSendConfig();
+
+// The original message list to be combined and forwarded, which can be obtained from the message history
+ArrayList<ZIMMessage> messageList = new ArrayList<>();
+messageList.add(message1);
+messageList.add(message2);
+
+ZIMCombineMessage combineMessage = new ZIMCombineMessage("Title", "Summary", messageList);
+
+zim.sendMessage(combineMessage,"conv_id", type, config, new ZIMMessageSentCallback() {
+    @Override
+    public void onMessageAttached(ZIMMessage zimMessage) {
+        // Developers can use this callback to listen for whether the message is ready to be sent. Only messages that pass the local basic parameter check will trigger this callback, otherwise errors will be thrown through the onMessageSent callback.               
+    }
+
+    @Override
+    public void onMessageSent(ZIMMessage zimMessage, ZIMError error) {
+        // Developers can use this callback to listen for whether the message is sent successfully.
+    }
+});
+```
+:::
+:::if{props.platform="iOS"}
+```objc
+// Send a combined message in a one-on-one chat session
+ZIMConversationType type = ZIMConversationTypePeer; // Conversation type, values: one-on-one: 0, room: 1, group: 2
+ZIMMessageSendConfig *config = [[ZIMMessageSendConfig alloc] init];
+
+// The original message list to be combined and forwarded, can be obtained from the message history
+NSMutableArray<ZIMMessage *> *messageList = [NSMutableArray array];
+[messageList addObject:message1];
+[messageList addObject:message2];
+
+ZIMCombineMessage *combineMessage = [[ZIMCombineMessage alloc] initWithTitle:@"Title" summary:@"Summary" messages:messageList];
+
+[zim sendMessage:combineMessage conversationId:@"conv_id" type:type config:config callback:^(ZIMMessage *zimMessage, ZIMError *error) {
+    if (error) {
+        // Developers can use this callback to listen for whether the message was sent successfully.
+    }
+}];
+```
+:::
+:::if{props.platform="window"}
+```cpp
+// Send a combined message in a one-on-one chat session
+ZIMConversationType type = ZIM_CONVERSATION_TYPE_PEER; //  Conversation type, values: one-on-one: 0, room: 1, group: 2
+ZIMMessageSendConfig config;
+
+// The original message list to be combined and forwarded, can be obtained from the message history
+std::vector<std::shared_ptr<ZIMMessage>> messageList;
+messageList.push_back(message1);
+messageList.push_back(message2);
+
+
+std::shared_ptr<ZIMCombineMessage> combineMessage = std::make_shared<ZIMCombineMessage>("Title", "Summary", messageList);
+
+if (message) {
+    // Developers can use this callback to listen for whether the message is ready to be sent. Only messages that pass the local basic parameter check will trigger this callback, otherwise errors will be thrown through the onMessageSent callback.
+}),
+[=](std::shared_ptr<zim::ZIMMessage> message, zim::ZIMError errorInfo) {
+    // Developers can use this callback to listen for whether the message is sent successfully.
+    if (errorInfo.code == zim::ZIMErrorCode::ZIM_ERROR_CODE_SUCCESS) {
+
+    }
+});
+```
+:::
+:::if{props.platform="Flutter"}
+```dart
+// Send a combined message in a one-on-one chat session
+
+try {
+    // Conversation type, values are one-on-one: peer, room: room, group: group
+    ZIMConversationType type = ZIMConversationType.peer;
+    ZIMMessageSendConfig config = ZIMMessageSendConfig();
+    // The original message list to be combined and forwarded, which can be obtained from the message history
+    List<ZIMMessage> messageList = [message1,message2];
+    ZIMCombineMessage combineMessage = ZIMCombineMessage(title: 'Title', summary: 'Summary', messageList: messageList);
+    ZIMMessageSentResult result = await ZIM.getInstance()!.sendMessage(combineMessage, 'conv_id', type, config);
+    // Message sent successfully
+} on PlatformException catch (onError){
+    onError.code;//Handle according to the error code table
+    onError.message;//Error message
+}
+```
+:::
+:::if{props.platform="Web"}
+```typescript
+// Send a combined message in a one-to-one chat.
+
+const toConversationID = ''; // The ID of the other user.
+const conversationType = 0; // The conversation type. Valid values: 0: one-to-one chat; 1: voice chatroom; 2: group chat.
+const config: ZIMMessageSendConfig = { 
+    priority: 1, // Specify the message priority. Valid values: 1 (default): low; 2: medium; 3: high.
+};
+
+const messageCombineObj: ZIMMessage = {
+    type: 31, 
+    title: 'Title', // The title of the combined message.
+    summary: 'Summary' , // The summary of the combined message.
+    messageList: [message1, message2], // The list of messages to be combined and forwarded, which can be obtained from historical messages.
+};
+
+const notification: ZIMMessageSendNotification = {
+    onMessageAttached: function(message) {
+        // To-do: loading.
+    }
+}
+
+zim.sendMessage(messageCombineObj, toConversationID, conversationType, config, notification)
+    .then(function ({ message }) {
+        // Sending succeeded.
+    })
+    .catch(function (err) {
+        // Sending failed.
+    });
+```
+:::
+
+
+### Receive combined messages
+
+The callback interface for receiving combined messages is the same as the callback interface for receiving normal messages. Please refer to [Send & Receive messages - Receive messages](./Send%20and%20receive%20messages.mdx#receive-rich-media-content) for the specific interface.
+
+<Warning title="Warning">
+
+The receive message callback only returns the title, summary, and combination ID of the combined message. If you need to know the content of the combined message, please refer to <a href="#view-merged-message-details">View Combined Message Details.</a> 
+</Warning>
+
+The following is an example code for a user to receive combined messages in a one-on-one conversation:
+
+:::if{props.platform=undefined}
+```java
+// User receives combined messages in a one-on-one conversation
+@Override
+    public void onPeerMessageReceived(ZIM zim, ArrayList<ZIMMessage> messageList,
+                                        ZIMMessageReceivedInfo info, String fromUserID) {
+        for (ZIMMessage message : messageList) {
+            if (message.getType() == ZIMMessageType.COMBINE){
+                // combined message
+            }
+        }
+    }
+```
+:::
+:::if{props.platform="iOS"}
+```objc
+// User receives combined messages in a one-on-one conversation
+- (void)zim:(ZIM *)zim
+    peerMessageReceived:(NSArray<ZIMMessage *> *)messageList
+            info:(ZIMMessageReceivedInfo *)info
+            fromUserID:(NSString *)fromUserID {
+    for (ZIMMessage *message in messageList) {
+        if ([message type] == ZIMMessageTypeCombine) {
+            // combined Message
+        }
+    }
+}
+```
+:::
+:::if{props.platform="window"}
+```cpp
+// User receives combined messages in a one-on-one conversation
+void onPeerMessageReceived(ZIM& zim, std::vector<ZIMMessage>& messageList, 
+                              ZIMMessageReceivedInfo info,
+                              std::string fromUserID) {
+    for (ZIMMessage& message : messageList) {
+        if (message.type == ZIMMessageType::ZIM_MESSAGE_TYPE_COMBINE) {
+            // combined Message
+        }
+    }
+}
+```
+:::
+:::if{props.platform="Flutter"}
+```dart
+// User receives a combined message in a one-on-one chat session
+ZIMEventHandler.onReceivePeerMessage = (ZIM zim, List<ZIMMessage> messageList, String fromUserID){
+    for(ZIMMessage message in messageList){
+    if(message.type == ZIMMessageType.combine){
+        // combined message
+    }
+    }
+};
+```
+:::
+:::if{props.platform="Web"}
+```typescript
+// The user receives a combined message in a one-to-one chat.
+zim.on('peerMessageReceived', function (zim, { messageList, fromConversationID }) {
+    console.log(messageList, fromConversationID);
+    messageList.forEach(function (msg) {
+        // The `Combine` message is received.
+        if (msg.type == 31) {
+        }
+    })
+});
+```
+:::
+
+### View combined message details
+
+Operations on a combined message, for example, listening, adding, and historical message pulling, return only the title, summary, and ID of the combined message. To view sub-messages contained in the combined message, call the {getPlatformData(props,queryCombineMessageDetailMap)} operation.
+
+
+The result is returned in the {getPlatformData(props,ZIMCombineMessageDetailQueriedCallbackMap)} callback.
+
+:::if{props.platform=undefined}
+```java
+public abstract void queryCombineMessageDetail(ZIMCombineMessage message,
+                                                ZIMCombineMessageDetailQueriedCallback callback);
+```
+:::
+:::if{props.platform="iOS"}
+```objc
+- (void)queryCombineMessageDetailByMessage:(ZIMCombineMessage *)message
+                                  callback:(ZIMCombineMessageDetailQueriedCallback)callback
+```
+:::
+:::if{props.platform="window"}
+```cpp
+virtual void
+queryCombineMessageDetail(std::shared_ptr<ZIMCombineMessage> &message,
+                            const ZIMCombineMessageDetailQueriedCallback &callback) = 0;
+```
+:::
+:::if{props.platform="Flutter"}
+```dart
+Future<ZIMCombineMessageDetailQueriedResult> queryCombineMessageDetail(ZIMCombineMessage message);
+```
+:::
+:::if{props.platform="Web"}
+```typescript
+queryCombineMessageDetail(message: ZIMCombineMessage): Promise<ZIMCombineMessageDetailQueriedResult>
+```
+:::
+
+| Parameter | Type | Required | Description |
+| ---- | ----| -------| -----|
+|message|{getPlatformData(props,ZIMCombineMessageMap)}| Yes| The combined message to be queried.|
+
+:::if{props.platform=undefined}
+```java
+zim.queryCombineMessageDetail(combineMessage, new ZIMCombineMessageDetailQueriedCallback() {
+            @Override
+            public void onCombineMessageDetailQueried(ZIMCombineMessage message, ZIMError error) {
+                // View the combined message, the specific sub-messages are in the messageList of the message in the callback.
+            }
+        });
+```
+:::
+:::if{props.platform="iOS"}
+```objc
+[zim queryCombineMessageDetailByMessage:combineMessage callback:^(ZIMCombineMessage * _Nonnull message, ZIMError * _Nonnull errorInfo) {
+        // View the combined message, the specific sub-messages are in the messageList of the message in the callback.
+    }];
+```
+:::
+:::if{props.platform="window"}
+```cpp
+zim_->queryCombineMessageDetail(combineMessage, [=](const std::shared_ptr<ZIMCombineMessage> &message, ZIMError &errorInfo) {
+        // View the combined message, the specific sub-messages are in the messageList of the message in the callback.
+    }];
+```
+:::
+:::if{props.platform="Flutter"}
+```dart
+try {
+    // Conversation type, values are one-on-one: peer, room: room, group: group
+    ZIMCombineMessageDetailQueriedResult result = await ZIM.getInstance()!.queryCombineMessageDetail(combineMessage);
+    // View the combined message, the specific sub-messages are in the messageList of the message in the callback.
+    result.message.messageList;
+    // Message sent successfully
+} on PlatformException catch (onError){
+    onError.code;//Handle according to the error code table
+    onError.message;//Error message
+}
+```
+:::
+:::if{props.platform="Web"}
+```typescript
+zim.queryCombineMessageDetail(message)
+    .then(function (message) {
+        // Operation succeeded. The list of sub-messages of the combined message is updated on the UI.
+        // The detailed sub-messages are contained in the messageList of the message in the callback.
+        console.log(message.messageList)
+    })
+    .catch(function (err) {
+        // Operation failed.
+    });
+```
+:::
+
+If one of the sub-messages is a combined message, you need to call the {getPlatformData(props,queryCombineMessageDetailMap)} operation to obtain the sub-messages of the combined message. If there are multiple nested combined messages, you need to call this operation multiple times accordingly.
+
+## Forward messages one by one
+
+Forwarding messages one by one is essentially sending messages that have been successfully sent as parameters to other conversations. It uses the same interface as sending normal messages. Developers can refer to [Send & Receive messages - Send messages](./Send%20and%20receive%20messages.mdx#send-rich-media-content) for details of this interface.

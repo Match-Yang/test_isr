@@ -1,0 +1,311 @@
+---
+articleID: 11567
+---
+
+import MarkMessageType from '/core_products/zim/zh/snippets/MessageType.mdx'
+import MarkSendMessageEvent from '/core_products/zim/zh/snippets/SendMessageEvent.mdx'
+import MessageSequenceDiagramOC from '/core_products/zim/zh/snippets/MessageSequenceDiagramOCzh.mdx'
+
+# 实现基本消息收发
+
+---
+
+本文介绍如何使用 ZIM SDK 快速实现基本的单聊会话消息收发功能。
+
+## 1 前提条件
+
+在使用 ZIM SDK 前，请确保：
+
+- 开发环境满足以下要求：
+    - Xcode 13 或以上版本。
+    - iOS 11.0 或以上版本，且支持音视频功能的 iOS 真机设备。
+
+- 已在 [ZEGO 控制台](https://console.zego.im) 创建项目，获取到了接入 ZIM SDK 服务所需的 AppID、AppSign。ZIM 服务权限不是默认开启的，使用前，请先在 [ZEGO 控制台](https://console.zego.im) 自助开通 ZIM 服务（详情请参考 [项目管理 - 即时通讯](https://doc-zh.zego.im/article/14994)），若无法开通 ZIM 服务，请联系 ZEGO 技术支持开通。
+
+<Warning title="注意">
+
+`2.3.0 及以上`版本的 SDK，开始支持 “AppSign 鉴权”，同时仍支持 “Token 鉴权”，若您需要升级鉴权方式，可参考 [ZIM 如何从 AppSign 鉴权升级为 Token 鉴权](http://doc-zh.zego.im/faq/token_upgrade_zim)。
+</Warning>
+
+## 2 集成 SDK
+
+### 2.1 （可选）新建项目
+<Accordion title="此步骤以如何创建新项目为例，如果是集成到已有项目，可忽略此步。" defaultOpen="false">
+
+1. 启动 Xcode，在 “Welcome to Xcode” 窗口中单击 “Create a new Xcode project” 或选择 “File > New > Project” 菜单。在出现的表单中，选择 iOS 平台，并在 “Application” 下选择 “App”。
+<Frame width="512" height="auto" caption=""><img src="https://storage.zego.im/sdk-doc/Pics/QuickStart/NewProject_1.png" /></Frame>
+
+2. 填写表单并选取各个选项来配置项目，完成后，单击 “Next”。
+
+    必须提供 “Product Name” 和 “Organization Identifier”，用于创建 App 的唯一标识 “Bundle Identifier”。
+    <Frame width="512" height="auto" caption=""><img src="https://storage.zego.im/sdk-doc/Pics/QuickStart/NewProject_2.png" /></Frame>
+
+3. 选择项目存储路径，单击 “Create” 创建项目。
+<Frame width="512" height="auto" caption=""><img src="https://storage.zego.im/sdk-doc/Pics/QuickStart/NewProject_3.png" /></Frame>
+
+</Accordion>
+
+### 2.2 导入 SDK
+
+开发者可通过以下任意一种方式实现集成 SDK。
+
+#### 方式一： 使用 Swift Package Manager 自动集成
+
+1. 打开 Xcode 并点击菜单栏 “File > Add Packages...”，在 “Apple Swift Packages” 弹窗的 “Search or Enter Package URL” 输入框中填写如下 URL 并敲击回车键确认：
+
+    ```markdown
+    https://github.com/zegolibrary/zim-ios
+    ```
+
+2. 在 “Dependency Rule” 中指定你想要集成的 SDK 版本（建议使用默认的 “Up to Next Major Version”），然后点击 “Add Package“ 导入 SDK。你也可以参考 [Apple 官方文档](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app) 进行设置。
+
+#### 方式二： 使用 CocoaPods 自动集成
+
+1. 安装 CocoaPods，安装时的常见问题请参考 [CocoaPods 常见问题 - 安装 CocoaPods](https://doc-zh.zego.im/article/13860#1/CocoaPods#1)。
+
+2. 打开终端，进入项目根目录，执行 `pod init` 命令创建 Podfile 文件。
+
+3. 打开 Podfile 文件，在 “target” 下添加 `pod 'ZIM'`，需要将 “MyProject” 替换为开发者的 Target 名称。
+
+    <Warning title="注意">
+
+    由于 SDK 为 XCFramework，只有 1.10.0 或以上版本的 CocoaPods 才能集成该 SDK。
+    </Warning>
+
+    ```ruby
+    target 'MyProject' do
+        use_frameworks!
+        pod 'ZIM'
+    end
+    ```
+
+4. 执行 `pod repo update` 命令更新本地索引，确保能安装最新版本的 SDK，最新版本号请参考 [发布日志](11593)。
+
+5. 执行 `pod install` 命令安装 SDK。
+
+    <Note title="说明">
+
+    - 若出现 “CDN: trunk URL couldn't be downloaded” 问题，请参考 [CocoaPods 常见问题 - 连接不上 trunk CDN 的问题](https://doc-zh.zego.im/article/13860#1#2)。
+    - 若出现 “Unable to find a specification for 'ZIM'” 问题，请参考 [CocoaPods 常见问题 - 无法找到项目的问题](https://doc-zh.zego.im/article/13860#1#3)。
+    - 若出现 “CocoaPods could not find compatible versions for pod "ZIM"” 问题，请参考 [CocoaPods 常见问题 - 无法找到项目的问题](https://doc-zh.zego.im/article/13860#1#3)。
+    </Note>
+
+#### 方式三：复制 SDK 文件手动集成
+
+1. 请参考 [下载 SDK](./Client%20SDKs/SDK%20downloads.mdx)，下载最新版本的 SDK。
+
+2. 将 SDK 包解压至项目目录下，例如 “libs” 文件夹下。
+<Frame width="512" height="auto" caption="">
+  <img src="https://storage.zego.im/sdk-doc/Pics/ZIM/iOS/directory.png" />
+</Frame>
+
+3. 选择 “TARGETS > General > Frameworks,Libraries,and Embedded Content” 菜单，添加 “ZIM.xcframework”，将 “Embed” 设置为 “Embed & Sign”。
+<Frame width="512" height="auto" caption="">
+  <img src="https://storage.zego.im/sdk-doc/Pics/ZIM/iOS/embed_and_Sign.png" />
+</Frame>
+
+## 3 实现基本收发消息
+
+以下流程中，我们以客户端 A 和 B 的消息交互为例：
+
+<Frame width="512" height="auto" caption="">
+  <img src="https://storage.zego.im/sdk-doc/Pics/ZIM/quick_start_Implementation.png" />
+</Frame>
+
+### 3.1 实现流程
+
+请参考 [跑通示例源码](./Sample%20code.mdx) 获取源码，相关功能的源码请查看 “ZIMExampleLegacy/Peer/ZGPeerChatViewController.m” 的文件。
+
+#### 1. 导入头文件
+
+在项目文件中引入头文件 “ZIM.h”。
+
+<a name="create"></a>
+
+```objc
+#import "ZIM/ZIM.h"
+```
+
+#### 2. 创建 ZIM 实例
+
+首先我们需要在 SDK 中创建 ZIM 实例，一个实例对应的是一个用户，表示一个用户以客户端的身份登录系统。
+
+例如，客户端 A、B 分别调用 [createWithAppConfig](@createWithAppConfig) 接口，传入在 [1 前提条件](#1-前提条件) 中获取到的 AppID、AppSign，创建了 A、B 的实例：
+
+<Warning title="注意">
+
+`2.3.0 及以上`版本的 SDK，开始支持 “AppSign 鉴权”，同时仍支持 “Token 鉴权”，若您需要升级鉴权方式，可参考 [ZIM 如何从 AppSign 鉴权升级为 Token 鉴权](http://doc-zh.zego.im/faq/token_upgrade_zim)。
+</Warning>
+
+```objc
+// 调用 createWithAppConfig 方法创建 ZIM 对象，传入 appID、appSign
+// 请注意：ZIM 从 2.3.0 版本开始支持 AppSign 鉴权，SDK 也默认为 AppSign 鉴权，如果您需要切换鉴权方式：
+// (1) 2.3.3 及以上版本的 SDK，支持鉴权方式的自主切换; (2) 2.3.0 ~ 2.3.1 版本的 SDK，需要切换为 “Token 鉴权” 时，请联系 ZEGO 技术支持处理
+ZIMAppConfig *appConfig = [[ZIMAppConfig alloc] init];
+appConfig.appID = 123456;// 填入实际的 appID
+appConfig.appSign = @"";// 填入实际的 appSign
+ZIM * zim = [ZIM createWithAppConfig:appConfig];
+```
+
+由于大多数开发者，在整个流程中，只需要将 ZIM 实例化一次。因此，ZEGO 建议您调用 [getInstance](@getInstance) 方法获取已创建的实例对象。
+
+
+```objc
+// 在成功调用 createWithAppConfig 方法创建实例后，可以通过 getInstance 方法获取 zim 对象。
+// 在调用 createWithAppConfig 方法之前，或者在调用 destroy 方法销毁实例之后，调用 getInstance 方法将返回 nil。
+ZIM *zim = [ZIM getInstance];
+```
+<a name="setEventHandler"></a>
+
+#### 3. 使用 EventHandler 协议
+
+在客户端登录前，开发者需要先声明 `ZIMEventHandler` 协议，然后通过调用 [setEventHandler](@setEventHandler) 接口并实现协议中的各个方法，来设置自定义 ZIM 中的事件回调，接收到 SDK 异常、消息通知回调等的通知。
+
+下图以在 ViewContorller 文件中，设置自定义连接状态改变为例。
+<Frame width="512" height="auto" caption="">
+  <img src="https://storage.zego.im/sdk-doc/Pics/ZIM/iOS/viewcontorller_h.png" />
+</Frame>
+<Frame width="512" height="auto" caption="">
+  <img src="https://storage.zego.im/sdk-doc/Pics/ZIM/iOS/viewcontorller_m.png" />
+</Frame>
+
+```objc
+[zim setEventHandler:self];
+
+- (void)zim:(ZIM *)zim errorInfo:(ZIMError *)errorInfo{
+    // 接收错误码的回调,通过该回调可以收到 sdk 的通用错误码。
+}
+
+- (void)zim:(ZIM *)zim tokenWillExpire:(unsigned int)second{
+    // 用于提示 token 即将过期，开发者可以通过该回调监听 token 快要过期的通知，自定义应对这一事件的 UI 状态
+}
+- (void)zim:(ZIM *)zim connectionStateChanged:(ZIMConnectionState)state event:(ZIMConnectionEvent)event extendedData:(NSDictionary *)extendedData {
+    // 连接状态变化通知，开发者可以通过该回调监听当前的登录连接状态，展示对应的 UI 状态
+}
+
+- (void)zim:(ZIM *)zim
+    peerMessageReceived:(NSArray<ZIMMessage *> *)messageList
+                   info:(ZIMMessageReceivedInfo *)info
+             fromUserID:(NSString *)fromUserID {
+    // 接收 1v1 通信的消息回调，登录后可通过该回调接收 1v1 通信的消息
+}
+```
+
+<a id="login"></a>
+
+详细的接口介绍，请参考 [tokenWillExpire](https://doc-zh.zego.im/article/api?doc=zim_API~objective-c_ios~protocol~ZIMEventHandler#zim-token-will-expire)、[connectionStateChanged](https://doc-zh.zego.im/article/api?doc=zim_API~objective-c_ios~protocol~ZIMEventHandler#zim-connection-state-changed-event-extended-data)、[peerMessageReceived](https://doc-zh.zego.im/article/api?doc=zim_API~objective-c_ios~protocol~ZIMEventHandler#zim-peer-message-received-info-from-user-id)。
+
+#### 4. 登录 ZIM
+
+创建实例后，客户端 A 和 B 需要登录 ZIM，只有登录成功后才可以开始发送、接收消息、更新 Token 等。
+
+首先，请创建用户个人登录配置（[ZIMLoginConfig](@-ZIMLoginConfig) 对象）；创建完毕后，调用 [loginWithUserID](https://doc-zh.zego.im/article/api?doc=zim_API~objective-c_ios~protocol~ZIM#login-with-user-id-config-callback-2) 接口，传入上述对象，即可登录 ZIM。
+
+<Warning title="注意">
+
+- “userID”、“userName” 支持开发者自定义规则生成。建议开发者将 “userID” 设置为一个有意义的值，可将其与自己的业务账号系统进行关联。
+- 如果你使用的是 “AppSign 鉴权”（默认），[ZIMLoginConfig.Token](@token-ZIMLoginConfig) 请保持为空。
+- 如果您使用的是 “Token 鉴权”，请参考 [使用 Token 鉴权](./Guides/Users/Authentication.mdx) 文档，获取 Token 后，并在登录 ZIM 时传入 [ZIMLoginConfig.Token](@token-ZIMLoginConfig)，鉴权通过后才能登录成功。
+</Warning>
+
+```objc
+// userID 最大 32 字节的字符串。仅支持数字，英文字符 和 '!', '#', '$', '%', '&', '(', ')', '+', '-', ':', ';', '<', '=', '.', '>', '?', '@', '[', ']', '^', '_', '{', '}', '|', '~'。
+// userName 最大 256 字节的字符串，无特殊字符限制。
+ZIMLoginConfig *config = [[ZIMLoginConfig alloc]init];
+config.userName = @"";
+// 使用 Token 鉴权，需要开发者填入 "使用 Token 鉴权" 文档生成的 Token，详情请参考 [使用 Token 鉴权]
+// 使用 AppSign 鉴权 (2.3.0 或以上版本的默认鉴权方式)，Token 参数填空字符串
+config.token = @"";
+
+[zim loginWithUserID:userID config:config callback:^(ZIMError * _Nonnull errorInfo) {
+    //这里填写登录的回调
+}];
+```
+
+#### 5. 发送消息
+
+客户端 A 登录成功后，可以向客户端 B 发送消息。
+
+目前 ZIM 支持的消息类型如下：
+
+<MarkMessageType />
+
+以下为发送`单聊文本消息`为例：客户端 A 可以调用 [sendMessage](@sendMessage) 接口，传入客户端 B 的 userID、消息内容、消息类型 conversationType 等参数，即可发送一条`文本消息`到 B 的客户端。
+
+- [ZIMMessageSentCallback](@ZIMMessageSentCallback) 回调，判断消息是否发送成功。
+- [onMessageAttached](@onMessageAttached-ZIMMessageSendNotification) 回调，在消息发送前，可以获得一个临时的 [ZIMMessage](@-ZIMMessage)，以便您添加一些业务处理逻辑。例如：在发送消息前，获取到该条消息的 ID 信息。开发者在发送“视频”等内容较大的消息时，可以在消息上传完成前，获取对应该条消息的 localMessageID，实现发送前 Loading 的效果。
+
+```objc
+// 以下以发送单聊信息为例，conversationType 设置为 ZIMConversationTypePeer
+ZIMTextMessage *zimMessage = [[ZIMTextMessage alloc]init];
+zimMessage.message = @"消息内容";
+ZIMMessageSendNotification *notification = [[ZIMMessageSendNotification alloc] init];
+notification.onMessageAttached = ^(ZIMMessage * _Nonnull message) {
+    // 发送前的回调，客户可以在这里获取一个临时对象，该对象与开发者创建的 zimMessage 对象属于同一对象，开发者可利用此特性做一些业务逻辑，如提前展示 UI 等
+};
+ZIMMessageSendConfig *config = [[ZIMMessageSendConfig alloc] init];
+config.priority = ZIMMessagePriorityMedium;  // 消息优先级，取值为 低:1 默认,中:2,高:3
+
+// 单聊时，conversationID 即是对方的 userID；群组时，conversationID 即是群组的 groupID；房间时，conversationID 即是房间的 roomID
+[zim sendMessage:zimMessage toConversationID:conversationID conversationType:ZIMConversationTypePeer config:config notification:notification callback:^(ZIMMessage * _Nonnull message, ZIMError * _Nonnull errorInfo) {
+    // 这里写发送消息后的回调
+    // toUserID 填这条消息接收者的 userID
+}];
+```
+
+#### 6. 接收消息
+
+客户端 B 登录 ZIM 后，将会收到在 [setEventHandler](@setEventHandler) 回调中设置的 [peerMessageReceived](https://doc-zh.zego.im/article/api?doc=zim_API~objective-c_ios~protocol~ZIMEventHandler#zim-peer-message-received-info-from-user-id) 监听接口，收到客户端 A 发送过来的消息。
+
+<Warning title="注意">
+
+收到消息时，由于类型是基类，首先需要判断消息类型是 Text 还是 Command，开发者需要强转基类为具体的子类，然后从 message 字段获取消息内容。
+</Warning>
+
+```objc
+- (void)zim:(ZIM *)zim
+    peerMessageReceived:(NSArray<ZIMMessage *> *)messageList
+                   info:(ZIMMessageReceivedInfo *)info
+             fromUserID:(NSString *)fromUserID{
+          for(ZIMMessage *message in messageList){
+        if (message.type == ZIMMessageTypeText){
+            ZIMTextMessage *textMessage = (ZIMTextMessage *)message;
+        }
+        else if (message.type == ZIMMessageTypeCommand){
+            ZIMCommandMessage *commandMessage = (ZIMCommandMessage *)message;
+        }
+    }
+}
+```
+
+#### 7. 退出登录
+
+如果客户端需要退出登录，直接调用 [logout](@logout) 接口即可。
+
+```objc
+[zim logout];
+```
+
+#### 8. 销毁 ZIM 实例
+
+如果不需要 ZIM 实例，可直接调用 [destroy](@destroy) 接口，销毁实例。
+
+```objc
+[zim destroy];
+```
+
+### 3.2 API 时序图
+
+通过以上的实现流程描述，API 接口调用时序图如下：
+
+<MessageSequenceDiagramOC />
+<MarkSendMessageEvent />
+
+## 相关文档
+
+- [如何获取 SDK 的堆栈信息？](https://doc-zh.zego.im/faq/IM_sdkStack)
+- [如何获取 SDK 的日志信息？](https://doc-zh.zego.im/faq/IM_sdkLog)
+- [如何设置消息的优先级更为合理？](https://doc-zh.zego.im/faq/IM_Message_Priority)
+- [什么时候使用自定义消息？](https://doc-zh.zego.im/faq/IM_CustomMessage)
+- [如何限制只有好友之间才能互发消息？](https://doc-zh.zego.im/faq/IM_FriendMeassge)
+- [支持发送消息给自己吗？](http://doc-zh.zego.im/faq/IM_send_toSelf)

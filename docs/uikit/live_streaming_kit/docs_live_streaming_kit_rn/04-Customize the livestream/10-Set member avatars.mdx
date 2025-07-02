@@ -1,0 +1,124 @@
+# Set member avatars
+
+This doc describes how to set user avatars in the member list.
+
+
+<Frame width="30%" height="auto" caption="">
+  <img src="https://media-resource.spreading.io/docuo/workspace564/27e54a759d23575969552654cb45bf89/59dc307c64.jpeg" alt="MemberAvatar.jpeg"/>
+</Frame> 
+
+To set user avatars in the member list, perform the following steps:
+
+<Steps>
+<Step title="Get the user avatar URL">
+Implement a function to retrieve the user avatar URL by the userID.
+<Warning title="Warning">
+Please note that here you need to set different avatars url for different users in the `getUserAvatar` function. If you hardcode a URL, then everyone's avatar will be the one you hardcoded.
+</Warning>
+</Step>
+<Step title="Set the member avatars">
+Set the avatars of live streaming members through `memberListConfig.avatarBuilder` in both HostPage and AudiencePage, so that all live streaming roles can see the same avatars in the member list. 
+</Step>
+</Steps>
+
+```typescript ReferenceCodeForHostPage {8-11,25-47}
+import React from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import ZegoUIKitPrebuiltLiveStreaming, { HOST_DEFAULT_CONFIG, ZegoLiveStreamingRole } from '@zegocloud/zego-uikit-prebuilt-live-streaming-rn';
+import * as ZIM from 'zego-zim-react-native';
+
+export default function HostPage(props) {
+
+    const getUserAvatar = (userID: string) => {
+        // This is just an example; please replace it with the storage address for user avatars in your app.
+        return `https://robohash.org/${userID}.png`
+    }
+
+    return (
+        <View style={styles.container}>
+            <ZegoUIKitPrebuiltLiveStreaming
+                appID={yourAppID}
+                appSign={yourAppSign}
+                userID={userID}
+                userName={userName}
+                liveID={liveID}
+
+                config={{
+                    ...HOST_DEFAULT_CONFIG,
+                    memberListConfig: {
+                        avatarBuilder: (userInfo: any) => {
+                            const showMe = userInfo.isSelf ? 'You' : '';
+                            const roleName = userInfo.role === ZegoLiveStreamingRole.host ? 'Host' : (userInfo.role === ZegoLiveStreamingRole.coHost ? 'Co-host' : '');
+                            let roleDesc = ''
+                            if (!showMe) {
+                              roleDesc = `${roleName ? ('(' + roleName + ')') : ''}`;
+                            } else {
+                              roleDesc = `(${showMe + (roleName ? (',' + roleName) : '')})`;
+                            } 
+                        
+                            return (
+                              <View style={styles.memberItemLeft}>
+                                <Image
+                                      style={styles.memberAvatar}
+                                      defaultSource={require('./resources/avatar_def.png')}
+                                      source={{uri: getUserAvatar(userInfo.userID)}}
+                                />
+                                <View style={[styles.memberName]}>
+                                    <Text numberOfLines={1} style={{fontSize: 16, color: '#FFFFFF'}}>{userInfo.userName}{roleDesc}</Text>
+                                </View>
+                              </View>
+                            );
+                        }
+                    },
+                }}
+                plugins={[ZIM]}
+            />
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 0,
+    },
+    hostInfo: {
+      flexDirection: 'row',
+      backgroundColor: 'rgba(30, 39, 64, 0.4)',
+      borderRadius: 1000,
+      paddingLeft: 3,
+      paddingRight: 12,
+      paddingTop: 3,
+      paddingBottom: 3,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 16,
+      display: 'flex',
+    },
+    hostName: {
+      color: '#FFFFFF',
+      fontSize: 14,
+    },
+    memberAvatar: {
+        width: 36,
+        height: 36,
+        backgroundColor: '#5c5c5c',
+        borderRadius: 1000,
+        marginRight: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    memberItemLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    memberName: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+})
+```

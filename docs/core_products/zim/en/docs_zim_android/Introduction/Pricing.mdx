@@ -1,0 +1,490 @@
+# Pricing
+
+- - -
+
+This article mainly introduces the billing methods and service pricing of In-app Chat.
+
+## Billing Methods
+
+Billing consists of three parts: plan fee, add-on fee, and content moderation fee.
+- Plan Fee:
+  - Prepayment is required when activating the in-app chat service. The default validity period of the plan is 30 days. If the actual usage is less than 30 days, it will be charged as 30 days.
+  - For the usage other than the free MAU quota of the plan, it will be charged at the price of US\$0.015/MAU (If you subscribe the "Pro" or "Enterprise" plan, ZEGOCLOUD will provide you with a free quota of 10,000 MAU per month).
+- Add-on Fee: Add-on service are charged on a monthly basis. For the usage less than a month (e.g., activating/deactivating services on the 15th of the month), it will be charged for the whole month. Prepayment is required when activating the service.
+- Content Moderation Fee: Once you have enabled the built-in content moderation service for In-app Chat, ZEGOCLOUD will charge you daily for the usage of different moderation types, based on the fees incurred the previous day. Additionally, you have the option to subscribe to packages offered by ZEGOCLOUD's business team.
+
+## Service Pricing
+
+### Plan Fee
+
+In-app Chat provides plans such as Free, Signaling, Pro, and Enterprise.
+
+<table>
+  <colgroup>
+    <col width="25%" />
+    <col />
+  </colgroup>
+<tbody><tr>
+<th>Plan</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>Free</td>
+<td>Used for experiencing In-app Chat. You can enable it on the ZEGOCLOUD console for free.</td>
+</tr>
+<tr>
+<td>Signaling</td>
+<td>Mainly for audio/video call and live streaming scenarios. It enables functions such as call invitation, room messages, and live chat messages based on the signaling feature of In-app Chat.</td>
+</tr>
+<tr>
+<td>Pro</td>
+<td>Mainly for chat scenarios. It enables complex functions such as intelligent customer service and chat.</td>
+</tr>
+<tr>
+<td>Enterprise</td>
+<td>An upgrade from the Pro plan, providing higher-level capabilities such as message reactions and room message history, meeting the needs of customers for advanced features.</td>
+</tr>
+</tbody></table>
+
+<table>
+  <colgroup>
+    <col />
+    <col />
+    <col />
+    <col />
+    <col />
+  </colgroup>
+<tbody><tr>
+<th></th>
+<th>Free</th>
+<th>Signaling</th>
+<th>Pro</th>
+<th>Enterprise</th>
+</tr>
+<tr>
+<th>Pricing</th>
+<td>Free</td>
+<td>US\$99</td>
+<td>US\$369</td>
+<td>US\$999</td>
+</tr>
+<tr>
+<th>User Limit</th>
+<td>100</td>
+<td>Unlimited</td>
+<td>Unlimited</td>
+<td>Unlimited</td>
+</tr>
+<tr>
+<th>Quota of Free Monthly Active Users (MAU)</th>
+<td>100</td>
+<td>10,000</td>
+<td>10,000</td>
+<td>10,000</td>
+</tr>
+<tr>
+<th>Increasing the number of MAUs</th>
+<td>-</td>
+<td>US\$0.0099/MAU</td>
+<td>US\$0.015/MAU</td>
+<td>US\$0.015/MAU</td>
+</tr>
+</tbody></table>
+
+<Note title="Note">
+
+- Monthly Active Users (MAU): Refers to a single user logging into In-app Chat, counted as 1 MAU. If the user logs in with a different device or logs in multiple times within the same month, the user will still be counted as the same MAU.
+- Plan Fee: The default validity plan period is 30 days. If the actual usage is less than 30 days after activation, it will still be counted as 30 days.
+- Plan Upgrade: If you upgrade to a higher plan when using a lower plan, the fee and validity period will be recalculated based on the new plan, and the fee for the original lower plan will not be refunded. The same applies if you downgrade from a higher plan to a lower plan.
+</Note>
+
+#### Plan Differences
+
+<table>
+  <colgroup>
+    <col />
+    <col />
+    <col />
+    <col />
+    <col />
+    <col />
+  </colgroup>
+<tbody><tr>
+<th>Feature</th>
+<th>Item</th>
+<th>Free</th>
+<th>Signaling</th>
+<th>Pro</th>
+<th>Enterprise</th>
+</tr>
+<tr>
+<td rowspan="11">Limitations</td>
+<td>Global Coverage</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>User Limit</td>
+<td>100</td>
+<td>Unlimited</td>
+<td>Unlimited</td>
+<td>Unlimited</td>
+</tr>
+<tr>
+<td>Concurrent Users</td>
+<td>20</td>
+<td>Unlimited</td>
+<td>Unlimited</td>
+<td>Unlimited</td>
+</tr>
+<tr>
+<td>Room Number</td>
+<td>10</td>
+<td>50 (adjustable)</td>
+<td>50 (adjustable)</td>
+<td>Unlimited</td>
+</tr>
+<tr>
+<td>Groups Number</td>
+<td>20</td>
+<td>✖</td>
+<td>Unlimited</td>
+<td>Unlimited</td>
+</tr>
+<tr>
+<td>Maximum Number of Group Members</td>
+<td>20</td>
+<td>✖</td>
+<td>200 (adjustable)</td>
+<td>2,000 (adjustable)</td>
+</tr>
+<tr>
+<td>Maximum Number of User Friends</td>
+<td>20</td>
+<td>✖</td>
+<td>3,000 (adjustable)</td>
+<td>3,000 (adjustable)</td>
+</tr>
+<tr>
+<td>Free History Message Storage Duration</td>
+<td>7 days</td>
+<td>✖</td>
+<td>30 days (adjustable)</td>
+<td>90 days (adjustable)</td>
+</tr>
+<tr>
+<td>Free MAU</td>
+<td>100</td>
+<td>10,000</td>
+<td>10,000</td>
+<td>10,000</td>
+</tr>
+<tr>
+<td>Server API Call Rate</td>
+<td>20</td>
+<td>20</td>
+<td>20</td>
+<td>20</td>
+</tr>
+<tr>
+<td>Multi-Device Login</td>
+<td>✖</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td rowspan="8">Messaging</td>
+<td>All Message Types</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Message Roaming</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Offline Messages</td>
+<td>✔️</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Message Recall</td>
+<td>✔️</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Message Read Receipt</td>
+<td>✖</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Message Reactions</td>
+<td>✖</td>
+<td>✖</td>
+<td>✖</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Message Search</td>
+<td>✖</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Message Extensions</td>
+<td>✔️</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td rowspan="3">Group</td>
+<td>Group Management</td>
+<td>✔️</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Group Profile Management</td>
+<td>✔️</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Group Attribute Management</td>
+<td>✖</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td rowspan="2">Room</td>
+<td>Room Management</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>View Historical Messages after Joining a Room</td>
+<td>✖</td>
+<td>✖</td>
+<td>✖</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td rowspan="2">Conversation</td>
+<td>Conversation Management</td>
+<td>✔️</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Conversation Pinning</td>
+<td>✖</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td rowspan="3">Push Notification</td>
+<td>Offline Push</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Message pushing to all users</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Custom Ringtones and Extensions</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Content Moderation</td>
+<td>Content Moderation for Text, Image, Audio, Video, etc.</td>
+<td>Additioanl Payment</td>
+<td>Additioanl Payment</td>
+<td>Additioanl Payment</td>
+<td>Additioanl Payment</td>
+</tr>
+<tr>
+<td rowspan="2">Advanced Features</td>
+<td>Call Invitations</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Multiple Package Name Support</td>
+<td>✖</td>
+<td>✔️</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+</tbody></table>
+
+<Note title="Note">
+
+- User limit: Refers to the number of users who have logged in to the In-app Chat service.
+- Room number: Refers to the total number of rooms that can be created by all users within a single AppID. When a created room is dismissed, it will not be counted towards the total.
+- Group number: Refers to the total number of groups that can be created by all users within a single AppID. When a created group is dismissed, it will not be counted towards the total.
+- Number of Group Members: When a user leaves a group, the total member number in that group decreases by one.
+- Number of User Friends: When a user deleted a friend, the total friend number of the user decreases by one.
+- Free History Message Storage Duration: In one-on-one and group chats, messages are stored in the cloud. In-app chat supports pulling of cloud messages when a user switching devices. Different plans provide different message storage durations, and messages that exceed the specified duration will be automatically destroyed.
+- View Historical Messages after Joining a Room: When a user is on the Enterprise plan, they can view historical messages in a room. In-app chat will save the most recent 2,000 messages and the room will not be automatically destroyed within 24 hours, allowing the user to retrieve historical messages.
+</Note>
+
+### Add-on fee
+
+Add-on services are used to increase the plan limitations.
+
+In-app Chat supports users of Signaling, Pro and Enterprise plans to subscribe add-on services. Add-on services are billed on a monthly basis.
+
+If the usage period is less than one month (e.g., if the service is activated/disabled on the 15th of the month), you will be billed for a full month.
+
+<table>
+  <colgroup>
+    <col />
+    <col />
+    <col />
+    <col />
+    <col />
+  </colgroup>
+<tbody><tr>
+<th rowspan="2">Billing Item</th>
+<th rowspan="2">Payment Method</th>
+<th colspan="3">Plan Limitations and Billing Models</th>
+</tr>
+<tr>
+<th>Signaling</th>
+<th>Pro</th>
+<th>Enterprise</th>
+</tr>
+<tr>
+<th>Unlimit the room number</th>
+<td>Prepaid</td>
+<td>US\$399 per month
+(50 rooms by default)</td>
+<td>US\$399 per month
+(50 rooms by default)</td>
+<td>Unlimited by default, no additional charges required</td>
+</tr>
+<tr>
+<th>Increase the maximum group member</th>
+<td>Prepaid</td>
+<td>✖</td>
+<td>US\$99 per month for every additional 2,000 members.&nbsp;
+If the number of additional members is less than 2,000, the fee will still be charged for 2,000 people.&nbsp;
+The maximum limit is 6,000 members.&nbsp;
+(200 members by default)</td>
+<td>US\$99 per month for every additional 2,000 members.&nbsp;
+If the number of additional members is less than 2,000, the fee will still be charged for 2,000 people.&nbsp;
+The maximum limit is 6,000 members.&nbsp;
+(2,000 members by default)</td>
+</tr>
+<tr>
+<th>Increase the maximum friend</th>
+<td>Prepaid</td>
+<td>✖</td>
+<td>
+US\$99 per month for every additional 1,000 friends.&nbsp;
+If the number of additional friends is less than 1,000, the fee will still be charged for 1,000 friends.&nbsp;
+Unlimited.
+(3,000 friends by default)
+</td>
+<td>US\$99 per month for every additional 1,000 friends.&nbsp;
+If the number of additional friends is less than 1,000, the fee will still be charged for 1,000 friends.&nbsp;
+Unlimited.
+(3,000 friends by default)</td>
+</tr>
+<tr>
+<th>Extend the duration of historical message storage</th>
+<td>Prepaid</td>
+<td>✖</td>
+<td><ul><li>90 days: US\$99 per month.</li><li>180 days: US\$249 per month.</li><li>360 days: US\$399 per month.</li></ul>(30 days by default)</td>
+<td><ul><li>90 days: Free.</li><li>180 days: US\$249 per month.</li><li>360 days: US\$249 per month.</li></ul></td>
+</tr>
+<tr>
+<th>Increase the rate limit of server-side API</th>
+<td>Prepaid</td>
+<td>✖</td>
+<td>Contact ZEGOCLOUD business personnel.</td>
+<td>Contact ZEGOCLOUD business personnel.</td>
+</tr>
+</tbody></table>
+
+<a id="content_fee"></a>
+### Content moderation fee
+
+If you need In-app Chat content moderation service, please refer to [Content Moderation - Overview](./../Guides/Content%20Moderation/Overview.mdx).
+
+After activating the content moderation service, you will receive a 7-day free trial. After the free trial period, In-app Chat will start tracking your actual usage on a daily basis and bill and settle the fee on the following day.
+
+Please contact ZEGOCLOUD business personnel for pricing details.
+
+## Example
+
+### Scenario
+
+If you subscribe to the Pro plan and have a MAU of 15,000.
+
+To meet your demands, you also want the following add-on services:
+- Increase the maximum number of group members to 4,000.
+- Increase the maximum number of friends to 5,000.
+
+This means you need to pay for the basic Pro plan fee and the fee for exceeding the free quota, as well as the fees for 2 add-ons of increasing the maximum group member" and 2 add-ons of increasing the maximum friend.
+
+### Fee details
+
+#### Plan fees
+
+With a MAU of 15,000 for the month, subtracting the free quota of 10,000 MAU included in the Pro plan, the additional billed MAU is 5,000. Therefore:
+
+Plan Fees = US\$369 + US\$0.015 × 5,000 = US\$444
+
+#### Add-on fees
+
+For the month, you have used 2 add-ons of increasing the maximum group member" and 2 add-ons of increasing the maximum friend. The usage fees for these add-ons are calculated on a monthly basis. Therefore:
+
+Add-on fees = US\$99 × 2 + US\$99 × 2 = US\$396
+
+#### Total cost
+
+**Total cost: Plan fees + Add-on fees = US\$840**
+
+## Discount
+
+<Note title="Note">
+
+[Starter Plan - 76% Off and Only $169to GET In-app Chat(Pro) and premium support for 1 month.](https://www.zegocloud.com/activity/special-packages)
+</Note>
+
+

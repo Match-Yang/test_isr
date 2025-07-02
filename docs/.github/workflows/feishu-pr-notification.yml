@@ -1,0 +1,78 @@
+name: prepare_pr_info
+
+on:
+  pull_request_target:
+    types: 
+      - assigned
+      - opened
+      - synchronize
+      - reopened
+      - closed
+      # 移除 review_requested 事件，因为当一个 PR 请求多个 reviewer 时
+      # 每个 reviewer 都会触发一次 review_requested 事件
+      - converted_to_draft
+      - ready_for_review
+      - review_request_removed
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+  issue_comment:
+    types: [created, edited, deleted]
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prepare PR info
+        id: pr_info
+        run: |
+          python -V
+          # 创建一个临时文件来存储信息
+          {
+            echo "export event_type='${{ github.event_name }}'"
+            echo "export action='${{ github.event.action }}'"
+            
+            if [[ "${{ github.event_name }}" == "issue_comment" && "${{ github.event.issue.pull_request != '' }}" == "true" ]]; then
+              PR_NUMBER=$(echo "${{ github.event.issue.pull_request.url }}" | awk -F'/' '{print $NF}')
+              echo "export pr_title='${{ github.event.issue.title }}'"
+              echo "export pr_url='${{ github.event.issue.pull_request.html_url }}'"
+              echo "export comment_body='${{ github.event.comment.body }}'"
+              echo "export comment_user='${{ github.event.comment.user.login }}'"
+            else
+              echo "export pr_title='${{ github.event.pull_request.title }}'"
+              echo "export pr_url='${{ github.event.pull_request.html_url }}'"
+              echo "export pr_body='${{ github.event.pull_request.body }}'"
+              echo "export pr_creator='${{ github.event.pull_request.user.login }}'"
+              echo "export pr_merged='${{ github.event.pull_request.merged }}'"
+            fi
+            
+            if [[ "${{ github.event_name }}" == "pull_request_review" ]]; then
+              echo "export review_body='${{ github.event.review.body }}'"
+              echo "export review_state='${{ github.event.review.state }}'"
+              echo "export reviewer='${{ github.event.review.user.login }}'"
+            fi
+          } > pr_info.txt
+          
+          # 打印文件内容
+          cat pr_info.txt
+
+      - name: Get changed files
+        if: github.event.pull_request
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          if [[ -n "$PR_NUMBER" ]]; then
+            changed_files=$(gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}/files" --jq '.[].filename')
+            echo "$changed_files" > changed_files.txt
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload PR info
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-info
+          path: |
+            pr_info.txt
+            changed_files.txt

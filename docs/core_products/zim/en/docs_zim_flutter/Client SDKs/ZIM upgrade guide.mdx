@@ -1,0 +1,445 @@
+---
+articleID: 15086
+---
+
+# ZIM upgrade Guide
+
+- - -
+
+This article introduces some instructions and precautions when upgrading the In-app Chat Flutter SDK.
+
+## 2.19.0 upgrade guide
+
+<Warning title="Warning">
+
+Starting from version 2.19.0, the following interfaces have undergone significant changes. Therefore, when upgrading from an older version to version 2.19.0, please read the following guidelines.
+</Warning>
+
+### downloadMediaFile and related callbacks	
+
+The [downloadMediaFile](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/downloadMediaFile.html) method has added the `config` parameter, which can be used to specify the media content to be downloaded from a multi-item message. This parameter is mandatory and will cause a compile error if not included. Please refer to this documentation to update your code.
+
+<CodeGroup>
+```java title="Usage in Version 2.19.0(For Multi-item Messages)" {3-5,6}
+// Assume multipleMessage.messageInfoList[0] is a text message, and multipleMessage.messageInfoList[1] is an image message
+ZIMMultipleMessage multipleMessage = message as ZIMMultipleMessage;
+ZIMMediaDownloadConfig config = ZIMMediaDownloadConfig();
+// Specify the image message to download
+config.messageInfoIndex = 1;
+
+zim.downloadMediaFile(multipleMessage, ZIMMediaFileType.originalFile, config, (ZIMMessage message, int currentFileSize, int totalFileSize) {
+    // Download progress
+}).then((ZIMMessage message) {
+    // Download complete
+}).catch((ZIMError errorInfo) {
+    // Download failed
+});
+```
+
+```java title="Usage in Version 2.19.0(For other Messages)" {3}
+ZIMImageMessage imageMessage = message as ZIMImageMessage;
+
+zim.downloadMediaFile(message, ZIMMediaFileType.originalFile, ZIMMediaDownloadConfig(), (ZIMMessage message, int currentFileSize, int totalFileSize) {
+    // Download progress
+}).then((ZIMMessage message) {
+    // Download complete
+}).catch((ZIMError errorInfo) {
+    // Download failed
+});
+```
+
+```dart title=“Old Usage” {3}
+ZIMImageMessage imageMessage = message as ZIMImageMessage;
+
+zim.downloadMediaFile(message, ZIMMediaFileType.originalFile, (ZIMMessage message, int currentFileSize, int totalFileSize) {
+    // Download progress
+}).then((ZIMMessage message) {
+    // Download complete
+}).catch((ZIMError errorInfo) {
+    // Download failed
+});
+```
+</CodeGroup>
+
+### sendMediaMessage
+
+The `sendMediaMessage` interface is deprecated. Starting from version 2.19.0, multimedia messages should also be sent using the [sendMessage](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/sendMessage.html) interface, reducing developers' maintenance costs.
+
+In [ZIMMessageSendNotification](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMMessageSendNotification-class.html), the `message` parameter type in the [onMediaUploadingProgress](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMMessageSendNotification/onMediaUploadingProgress.html) callback method has been changed from `ZIMMessage` to `ZIMMediaMessage`, ensuring that only media messages will trigger the callback notification. Developers need to correct the call according to the compile error prompts in the IDE. (Currently, only developers using the [replyMessage](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/replyMessage.html) interface will be affected and need to resolve compile errors.)
+
+<CodeGroup>
+```dart title=“Usage in Version 2.19.0” {6,10,14}
+ZIMImageMessage imageMessage = ZIMImageMessage(fileLocalPath);
+
+ZIMMessageSendConfig config = ZIMMessageSendConfig();
+config.priority = ZIMMessagePriority.medium;
+
+ZIMMessageSendNotification notification = ZIMMessageSendNotification();
+notification.onMessageAttached = (ZIMMessage message) {
+    // Developers can listen to this callback to perform business logic before sending the message
+};
+notification.onMessageUploadingProgress = (ZIMMediaMessage message, int currentFileSize, int totalFileSize) {
+    // Multimedia upload progress
+};
+
+zim.sendMessage(imageMessage, "TO_CONVERSATION_ID", ZIMConversationType.peer, config, notification).then((ZIMMessage message) {
+    // Message send result
+}).catch((ZIMError errorInfo) {
+    // Message send failed
+});
+```
+
+```dart title=“Old Usage” {6,10,14}
+ZIMImageMessage imageMessage = ZIMImageMessage(fileLocalPath);
+
+ZIMMessageSendConfig config = ZIMMessageSendConfig();
+config.priority = ZIMMessagePriority.medium;
+
+ZIMMessageSendNotification notification = ZIMMessageSendNotification();
+notification.onMessageAttached = (ZIMMessage message) {
+    // Developers can listen to this callback to perform business logic before sending the message
+};
+notification.onMessageUploadingProgress = (ZIMMediaMessage message, int currentFileSize, int totalFileSize) {
+    // Multimedia upload progress
+};
+
+zim.sendMessage(imageMessage, "TO_CONVERSATION_ID", ZIMConversationType.peer, config, notification).then((ZIMMessage message) {
+    // Message send result
+}).catch((ZIMError errorInfo) {
+    // Message send failed
+});
+```
+</CodeGroup>
+
+## 2.18.0 upgrade guide
+
+<Warning title="Warning">
+
+Starting from version 2.18.0, the following interfaces have undergone significant changes. Therefore, when upgrading from an older version to version 2.16.0, please read the following guidelines.
+</Warning>
+
+### Callback on receiving one-to-one messages
+
+The deprecated callback `onReceivePeerMessage` for receiving one-to-one messages has been replaced by [onPeerMessageReceived](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMEventHandler/onReceivePeerMessage.html).
+
+
+The new callback supports the following features:
+- When a user is online, they can receive one-to-one messages through this callback.
+- When a user logs back into the ZIM SDK, they can receive all one-to-one messages received during their offline period (up to 7 days).
+
+```dart
+// New callback
+static void Function(
+        ZIM zim, List<ZIMMessage> messageList,
+        ZIMMessageReceivedInfo info, String fromUserID)? 
+    onPeerMessageReceived;
+
+// Old callback
+static void Function(
+        ZIM zim, List<ZIMMessage> messageList, String fromUserID)?
+    onReceivePeerMessage;
+```
+
+### Callback on receiving room messages
+
+The deprecated callback `onReceiveRoomMessage` for receiving room messages has been replaced by [onRoomMessageReceived](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMEventHandler/onRoomMessageReceived.html).
+
+The new callback supports the following features:
+- When a user is online, they can receive online room messages through this callback.
+- When a user goes from offline to online and is still in the room, they can receive all room messages that were sent during their offline period through this callback.
+
+```dart
+// New callback
+static void Function(
+        ZIM zim, List<ZIMMessage> messageList,
+        ZIMMessageReceivedInfo info, String fromRoomID)?
+     onRoomMessageReceived;
+
+// Old callback
+static void Function(
+        ZIM zim, List<ZIMMessage> messageList, String fromRoomID)?
+    onReceiveRoomMessage;
+```
+
+### Callback on receiving group messages
+
+The deprecated callback `onReceiveGroupMessage` for receiving group messages has been replaced by [onGroupMessageReceived](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMEventHandler/onGroupMessageReceived.html).
+
+The new callback supports the following features:
+- When the user is online, they can receive online group messages through this callback.
+- When the user logs back into the ZIM SDK, they can receive all group chat messages received during the offline period (up to 7 days) through this callback.
+
+```dart
+// New Callback
+static void Function(ZIM zim, List<ZIMMessage> messageList,
+    ZIMMessageReceivedInfo info, String fromGroupID)? onGroupMessageReceived;
+
+// Old Callback
+static void Function(
+        ZIM zim, List<ZIMMessage> messageList, String fromGroupID)?
+    onReceiveGroupMessage;
+```
+
+## 2.16.0 Upgrade Guide
+
+<Warning title="Warning">
+
+Please note that starting from version 2.16.0, there are significant changes to the following interfaces. Therefore, when upgrading from an older version to version 2.16.0, please read the following guide.
+</Warning>
+
+#### 1. Changes to the callCancel method
+
+The following changes only apply to **advanced mode** call invitations.
+
+
+In the new version of [callCancel](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/callCancel.html), if the parameter userIDs contains a userID, the interface will only cancel the invitation for that callee. If the userIDs parameter is empty, the interface will cancel the invitation for all callees.
+
+For the old version of the `callCancel` method, regardless of whether the userIDs parameter is empty or not, it is considered as canceling the invitation for all callees.
+
+Since the old version of the ZIM SDK is not compatible with separate cancellation logic, if you need to retain the cancellation logic implemented using the old version of ZIM and also need to use the separate cancellation feature of the new version, please isolate the call functionality between the old and new versions of ZIM.
+
+<CodeGroup>
+```dart title="Usage in version 2.16.0"
+  // Cancel userIdA and userIdB separately
+  List<String> invitees;  // List of invitees
+  invitees.add("userIdA","userIdB");  // IDs of invitees
+  String callid = "12352435";  // Call ID
+  ZIMCallCancelConfig config = new ZIMCallCancelConfig();
+
+  ZIM
+      .getInstance()
+      !.callCancel(invitees, callID, callCancelConfig)
+      .then((value) => {
+  })
+      .catchError((onError) {});
+
+
+  // Cancel the entire call invitation by passing an empty array to invitees. This can be called successfully when none of the callees in the entire call have accepted the invitation
+  List<String> invitees;  // List of invitees
+  String callid = "12352435";  // Call ID
+  ZIMCallCancelConfig config = new ZIMCallCancelConfig();
+
+  ZIM
+      .getInstance()
+      !.callCancel(invitees, callID, callCancelConfig)
+      .then((value) => {
+  })
+      .catchError((onError) {});
+  ```
+```dart title="Usage in old versions"
+  // Whether the userID is passed in the userIDs parameter or not, it is considered as canceling the entire call. This can be called successfully when none of the callees in the entire call have accepted the invitation
+  List<String> invitees;  // List of invitees
+  invitees.add("userIdA","userIdB");  // IDs of invitees
+  String callid = "12352435";  // Call ID
+  ZIMCallCancelConfig config = new ZIMCallCancelConfig();
+
+  ZIM
+      .getInstance()
+      !.callCancel(invitees, callID, callCancelConfig)
+      .then((value) => {
+  })
+      .catchError((onError) {});
+
+
+  // Cancel the entire call invitation by passing an empty array to invitees. This can be called successfully when none of the callees in the entire call have accepted the invitation
+  List<String> invitees;  // List of invitees
+  String callid = "12352435";  // Call ID
+  ZIMCallCancelConfig config = new ZIMCallCancelConfig();
+
+  ZIM
+      .getInstance()
+      !.callCancel(invitees, callID, callCancelConfig)
+      .then((value) => {
+  })
+      .catchError((onError) {});
+  ```
+</CodeGroup>
+
+## 2.13.0 Upgrade Guide
+
+<Warning title="Warning">
+
+Please note that starting from version 2.13.0, there are significant changes to the following interfaces. Therefore, when upgrading from an older version to version 2.13.0, please read the following guide.
+</Warning>
+
+#### 1. Changes to the login method
+
+The old version of the `login` method has been deprecated. The new version of [login](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/login.html) method supports more configurations through [ZIMLoginConfig](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMLoginConfig-class.html), such as whether to use Token authentication and whether to login offline.
+
+<CodeGroup>
+```dart title="Usage in version 2.13.0"
+  try{
+      // When logging in, developers need to generate a token according to the "Token Authentication" document
+      // userID is a string with a maximum of 32 bytes. It only supports numbers, English characters, and '!', '#', '$', '%', '&', '(', ')', '+', '-', ':', ';', '<', '=', '.', '>', '?', '@', '[', ']', '^', '_', '{', '}', '|', '~'.
+      // userName is a string with a maximum of 256 bytes, with no special character restrictions.
+      ZIMLoginConfig loginConfig = ZIMLoginConfig();
+      // The user nickname, leave it blank if you don't want to modify the user nickname
+      loginConfig.userName = 'userName';
+      // If using token for login authentication, please fill in this parameter, otherwise no need to fill in
+      loginConfig.token = '';
+      // Whether this login is an offline login, please refer to the offline login documentation for details
+      loginConfig.isOfflineLogin = false;
+      await ZIM.getInstance()?.login('zego', loginConfig);
+      // Login successful, write the business logic for successful login
+  } on PlatformException catch(onError){
+      // Login failed
+      // Error code for login failure, please refer to the error code documentation for handling
+      onError.code;
+      // Error message for login failure
+      onError.message;
+  }
+  ```
+```dart title="Usage in old versions"
+  // When logging in, developers need to generate a token according to the "Token Authentication" document
+  // userID is a string with a maximum of 32 bytes. It only supports numbers, English characters, and '!', '#', '$', '%', '&', '(', ')', '+', '-', ':', ';', '<', '=', '.', '>', '?', '@', '[', ']', '^', '_', '{', '}', '|', '~'.
+  // userName is a string with a maximum of 256 bytes, with no special character restrictions.
+  var userInfo = { userID: 'xxxx', userName: 'xxxx' };
+  var token = '';
+
+  zim.login(userInfo, token)
+  .then(function () {
+      // Login successful
+  })
+  .catch(function (err) {
+      // Login failed
+  });
+  ```
+</CodeGroup>
+
+## 2.9.0 upgrade guide
+
+<Warning title="Warning">
+
+Please note that starting from version 2.9.0, the API method has undergone major changes, so please read the following guidelines when upgrading from older versions to version 2.9.0.
+
+</Warning>
+
+#### The [onCallInvitationTimeout](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMEventHandler/onCallInvitationTimeout.html) method changed
+
+The [onCallInvitationTimeout](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMEventHandler/onCallInvitationTimeout.html) callback method has added a new parameter `ZIMCallInvitationTimeoutInfo`, developers are required to provide this parameter, otherwise the code cannot be compiled successfully.
+ 
+
+<CodeGroup>
+```dart title="Usage in old versions"
+  ZIMEventHandler.onCallInvitationTimeout = (ZIM zim, String callID){
+
+  };
+  ```
+```dart title="Usage in old 2.9.0"
+  ZIMEventHandler.onCallInvitationTimeout = (ZIM zim, ZIMCallInvitationTimeoutInfo info, String callID){
+    
+  };
+  ```
+</CodeGroup>
+
+## 2.3.0 upgrade guide
+
+<Warning title="Warning">
+
+Please note that starting from version 2.3.0, the API method has undergone major changes, so please read the following guidelines when upgrading from older versions to version 2.3.0.
+</Warning>
+
+#### 1. The [create](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/create.html) method changed
+
+Changed the [create](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/create.html) method from a member function to a static function, and changed the return value from `Future<ZIM>` to `ZIM?`.
+
+When you use In-app Chat, please call this method first. **Also, you should remove the keyword `await`.**
+
+* How we use it with the older version of SDK:
+
+    ```dart
+    await ZIM.getInstance().create(12345678);
+    ```
+
+* To use it with SDK V2.3.0:
+
+    ```dart
+    ZIMAppConfig appConfig = ZIMAppConfig();
+    appConfig.appID = 12345678;
+    appConfig.appSign = 'abcdefg...';
+
+    ZIM.create(appConfig);
+    ```
+
+#### 2. The [getInstance](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/getInstance.html) method changed
+
+Changed the return value of the [getInstance](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/getInstance.html) method from `ZIM` to `ZIM?`, so please be careful about null safety.
+
+Every API method needs to be adjusted, and one of the API usage adjustments is shown below.
+
+* How we use it with the older version of SDK:
+
+    ```dart
+    await ZIM.getInstance().login(userInfo, token);
+    ```
+
+* To use it with SDK V2.3.0:
+
+    ```dart
+    await ZIM.getInstance()!.login(userInfo, token);
+    ```
+
+#### 3. Instance parameters added
+
+We added the In-app Chat instance parameter as a callback parameter. Each callback needs to be adjusted, and the following takes a method as an example: 
+
+* How we use it with the older version of SDK:
+
+    ```dart
+    ZIMEventHandler.onConnectionStateChanged = (state, event, extendedData) {
+        // to do something...
+    };
+    ```
+
+* To use it with SDK V2.3.0:
+
+    ```dart
+    ZIMEventHandler.onConnectionStateChanged = (zim, state, event, extendedData) {
+        // to do something...
+    };
+    ```
+
+#### 4. Unnecessary Future return value removed
+
+We removed unnecessary Future return values in some API methods, so that `await` return values are not needed.
+
+The methods involved are: [destroy](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/destroy.html), [logout](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/logout.html), [setLogConfig](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/setLogConfig.html), [setCacheConfig](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/setCacheConfig.html), and [beginRoomAttributesBatchOperation](https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/beginRoomAttributesBatchOperation.html).
+
+* How we use it with the older version of SDK:
+
+    ```dart
+    await ZIM.getInstance().setLogConfig(config);
+    ......
+
+    await ZIM.getInstance().setCacheConfig(config);
+    ......
+
+    await ZIM.getInstance().beginRoomAttributesBatchOperation(roomID, config);
+    ......
+
+    await ZIM.getInstance().logout();
+    ......
+
+    await ZIM.getInstance().destroy();
+    ......
+    ```
+
+* To use it with SDK V2.3.0:
+
+    ```dart
+    ZIM.setLogConfig(config);
+    ......
+
+    ZIM.setCacheConfig(config);
+    ......
+
+    ZIM.getInstance()!.beginRoomAttributesBatchOperation(roomID, config);
+    ......
+
+    ZIM.getInstance()!.logout();
+    ......
+
+    ZIM.getInstance()!.destroy();
+    ......
+    ```
+

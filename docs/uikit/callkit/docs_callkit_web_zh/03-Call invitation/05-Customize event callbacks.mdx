@@ -1,0 +1,35 @@
+# 自定义事件回调
+
+
+如果 [自定义呼叫邀请用户界面](./02-Customize%20the%20UI%20for%20call%20invitation.mdx) 和[自定义呼叫邀请配置](./04-Customize%20call%20invitation%20config.mdx) 文档无法满足您进一步定制的需求，Call Kit 还为您提供了一些事件回调：
+
+```javascript
+zp.setCallInvitationConfig({
+    // 当收到呼叫邀请时，被叫用户将通过此回调接收通知。
+    onIncomingCallReceived: (callID, caller, callType, callees) => {},
+
+    // 当主叫用户取消呼叫邀请时，被叫用户将通过此回调接收通知。
+    onIncomingCallCanceled: (callID, caller) => {},
+
+    // 当被叫用户接受呼叫邀请时，主叫用户将通过此回调接收通知。
+    onOutgoingCallAccepted: (callID, callee) => {},
+
+    // 当被叫用户正在通话（忙线）时，主叫用户将通过此回调接收通知。
+    onOutgoingCallRejected: (callID, callee) => {},
+
+    // 当被呼叫者拒绝呼叫邀请时，主叫用户将通过此回调接收通知。
+    onOutgoingCallDeclined: (callID, callee) => {},
+
+    // 当被叫用户未响应呼叫邀请时，被叫用户将通过此回调接收通知。
+    onIncomingCallTimeout: (callID, caller) => {},
+
+    // 当呼叫邀请超时时，主叫用户将通过此回调接收通知。
+    onOutgoingCallTimeout: (callID, callees) => {},
+
+    // 当被叫用户点击呼叫邀请弹窗上的接受按钮时，会收到该回调通知。
+    onIncomingCallAcceptButtonPressed: () => {},
+
+    // 当被叫用户点击呼叫邀请弹窗上的拒绝按钮时，会收到该回调通知。
+    onIncomingCallDeclineButtonPressed: () => {}
+})
+```

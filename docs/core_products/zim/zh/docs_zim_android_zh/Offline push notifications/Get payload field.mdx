@@ -1,0 +1,44 @@
+---
+articleID: 16802
+---
+# 获取 payload 字段
+
+## 功能简介
+
+离线推送发送端通过配置 [ZIMPushConfig](@-ZIMPushConfig) 的 payload 参数（2.5.0 之前版本为 extendedData 参数）向接收端发送额外信息，接收端需使用 ZPNs SDK 时，通过厂商通道的 extras 里面的 payload 字段获取该信息。
+
+本文档介绍了如何使用 ZPNs SDK 的接口，获取 payload 透传字段。
+
+import Content from '/core_products/zim/zh/snippets/ZIMZPNsVersionMatchWarning.mdx'
+
+<Content />
+
+
+## 前提条件
+
+- 已集成 ZPNs SDK，详情请参考[实现离线推送](./Implement%20offline%20push%20notification.mdx)。
+
+## 实现流程
+
+1. 在 AndroidManifest.xml 文件设置主 Activity 的 exported 属性为 true，并配置 intent-filter。
+  
+```xml
+<activity
+    android:name="您的项目的主 Activity 路径"
+    android:exported="true">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity>
+```
+
+2. 开发者在主 Activity 的 `onCreate` 或者 `onNewIntent` 中，通过如下方式，调用 [getZPNsMessage](@getZPNsMessage) 获取数据。
+
+```JAVA
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    ZPNsMessage zpNsInfo = ZPNsManager.getInstance().getZPNsMessage(this.getApplication(), getIntent());
+}
+```

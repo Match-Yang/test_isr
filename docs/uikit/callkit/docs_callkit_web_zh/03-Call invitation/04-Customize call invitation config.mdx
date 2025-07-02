@@ -1,0 +1,102 @@
+# 自定义呼叫邀请配置
+
+## 介绍
+
+Call Kit 支持配置呼叫邀请中的各项设置，以及定义呼叫结束后的逻辑。
+
+## 自定义呼叫配置
+
+```javascript
+zp.setCallInvitationConfig({
+    // 在加入房间之前接受呼叫邀请的回调（房间用于进行呼叫），可用于设置房间配置。Call Kit 使您能够自动加入房间，并根据特定呼叫类型（ZegoInvitationType）调整房间配置。
+    onSetRoomConfigBeforeJoining: (callType) => {
+        return {
+            // ...,
+            showScreenSharingButton: false,
+            // ...
+        }
+    },
+})
+```
+
+您还可以通过自定义参数来定制特定功能。以下是完整的参数示例：
+
+``` javascript
+export interface RoomConfig {
+    container?: HTMLElement | undefined | null; // 呼叫组件容器。
+    turnOnMicrophoneWhenJoining?: boolean; // 加入呼叫时是否启用麦克风。默认启用。
+    turnOnCameraWhenJoining?: boolean; // 加入呼叫时是否启用摄像头。默认启用。
+    showMyCameraToggleButton?: boolean; // 是否显示切换本端用户的摄像头的按钮。默认显示。
+    showMyMicrophoneToggleButton?: boolean; // 是否显示切换本端用户的麦克风的按钮。默认显示。
+    showAudioVideoSettingsButton?: boolean; // 是否显示音频和视频设置按钮。默认显示。
+
+    showTextChat?: boolean; // 是否在右侧显示文本聊天界面。默认显示。
+    showUserList?: boolean; // 是否显示参与者列表。默认显示。
+    lowerLeftNotification?: {
+        showUserJoinAndLeave?: boolean; // 是否在左下角显示通知有参与者加入和离开房间。默认显示。
+        showTextChat?: boolean; // 是否在左下角显示最新消息。默认显示。
+    };
+    branding?: {
+        logoURL?: string; // 品牌 LOGO 的 URL。
+    };
+    maxUsers?: number; // 呼叫中的参与者范围为[2-20]。默认值为无限制。
+    layout?: "Sidebar" | "Grid" | "Auto"; // 布局模式。默认使用自动模式。
+
+    showNonVideoUser?: boolean; // 是否显示非视频参与者。默认显示。
+    showOnlyAudioUser?: boolean; // 是否显示仅音频参与者。默认显示。
+
+    useFrontFacingCamera?: boolean; // 加入房间时是否使用前置摄像头。默认使用前置摄像头。
+    onJoinRoom?: (users: ZegoUser[]) => void; // 参与者进入加入前视图的回调。
+    onLeaveRoom?: (users: ZegoUser[]) => void;// 参与者退出离开视图的回调。
+    onUserJoin?: (user: ZegoUser[]) => void; // 其他参与者加入呼叫的回调。
+    onUserLeave?: (user: ZegoUser[]) => void; // 其他参与者离开呼叫的回调。
+    showScreenSharingButton?: boolean; // 是否显示屏幕共享按钮。默认显示。
+    showLayoutButton?: boolean; // 是否显示切换布局的按钮。默认显示。
+    showPinButton?: boolean; // 是否显示固定按钮。默认显示。
+
+    onUserAvatarSetter?: (user: ZegoUser[]) => void; // 可以设置用户头像的回调。
+    videoResolutionList?: VideoResolution[]; // 视频分辨率列表。
+    videoResolutionDefault?: VideoResolution; // 默认视频分辨率。
+    whiteboardConfig?: {            
+        showAddImageButton?: boolean, // 默认设置为false。要使用此功能，请激活文件共享功能，然后导入插件。否则，将出现此提示：“添加图像失败，不支持此功能。”
+    }
+}
+```
+
+
+## 如何自定义呼叫结束时的逻辑？
+
+```javascript
+zp.setCallInvitationConfig({
+    // 呼叫邀请结束的回调（当呼叫邀请被拒绝/超时/取消/因忙碌状态结束时触发）。
+    onCallInvitationEnded: (reason,data) =>{
+        // 在此处添加自定义逻辑。
+    };
+})
+```
+
+以下列出了“reason”（呼叫邀请失败/呼叫邀请结束的原因）的所有值：
+
+```ts
+export enum CallInvitationEndReason {
+    Declined = "Declined",
+    Timeout = "Timeout",
+    Canceled = "Canceled",
+    Busy = "Busy",
+    LeaveRoom = "LeaveRoom",
+}
+```
+
+## 设置因发起者离开而自动结束通话
+
+默认情况下，通话在发起者离开后仍将继续。如需因发起者离开而自动结束通话，请将 `CallInvitationConfig.endCallWhenInitiatorLeave` 属性设置为 `true`。
+
+<Note title="说明">
+如需使用此功能，请将 Call Kit 升级至 v2.11.0 或更新版本。 
+</Note>
+
+```javascript {2}
+zp.setCallInvitationConfig({
+    endCallWhenInitiatorLeave: true
+})
+```

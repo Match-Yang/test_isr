@@ -1,0 +1,381 @@
+---
+articleID: 14239
+---
+
+import { getPlatformData } from "/snippets/utils-content-parser.js"
+
+
+export const deleteMessagesMap = {
+  'Android': <a href='@deleteMessages' target='_blank'>deleteMessages</a>,
+  'Flutter': <a href='https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/deleteMessages.html' target='_blank'>deleteMessages</a>,
+}
+export const ZIMMessageDeletedCallbackMap = {
+  'Android': <a href='@-ZIMMessageDeletedCallback' target='_blank'>ZIMMessageDeletedCallback</a>,
+  'Web': <a href='@-ZIMMessageDeletedResult' target='_blank'>ZIMMessageDeletedResult</a>,
+  'Flutter': <a href='https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMMessageDeletedResult-class.html' target='_blank'>ZIMMessageDeletedResult</a>,
+  'iOS,mac,window': <a href='@ZIMMessageDeletedCallback' target='_blank'>ZIMMessageDeletedCallback</a>,
+}
+export const deleteAllMessageMap = {
+  'Android': <a href='@deleteAllMessage' target='_blank'>deleteAllMessage</a>,
+  'Flutter': <a href='https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/deleteAllMessage.html' target='_blank'>deleteAllMessage</a>,
+  'iOS,mac': <a href='@deleteAllMessageByConversationID' target='_blank'>deleteAllMessageByConversationID</a>,
+}
+export const deleteAllConversationMessagesWithConfigMap = {
+  'Android': <a href='@deleteAllConversationMessages' target='_blank'>deleteAllConversationMessages</a>,
+  'Flutter': <a href='https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIM/deleteAllConversationMessages.html' target='_blank'>deleteAllConversationMessages</a>,
+  'iOS,mac': <a href='@deleteAllConversationMessagesWithConfig' target='_blank'>deleteAllConversationMessagesWithConfig</a>,
+}
+export const ZIMMessageDeleteConfigMap = {
+  'Android': <a href='@-ZIMMessageDeleteConfig' target='_blank'>ZIMMessageDeleteConfig</a>,
+  'Flutter': <a href='https://pub.dev/documentation/zego_zim/latest/zego_zim/ZIMMessageDeleteConfig-class.html' target='_blank'>ZIMMessageDeleteConfig</a>,
+}
+export const ZIMConversationMessagesAllDeletedCallbackMap = {
+  'Android': <a href='@-ZIMConversationMessagesAllDeletedCallback' target='_blank'>ZIMConversationMessagesAllDeletedCallback</a>,
+  'Web': <a href='@-ZIMConversationMessagesAllDeletedResult' target='_blank'>ZIMConversationMessagesAllDeletedResult</a>,
+  'iOS,mac,window': <a href='@ZIMConversationMessagesAllDeletedCallback' target='_blank'>ZIMConversationMessagesAllDeletedCallback</a>,
+}
+export const messageDeletedMap = {
+  'Android': <a href='@onMessageDeleted' target='_blank'>onMessageDeleted</a>,
+  'Web': <a href='@messageDeleted' target='_blank'>messageDeleted</a>,
+  'iOS': <a href='https://docs.zegocloud.com/article/api?doc=zim_API~objective-c_ios~protocol~ZIMEventHandler#zim-message-deleted' target='_blank'>messageDeleted</a>,
+  'mac': <a href='https://docs.zegocloud.com/article/api?doc=zim_API~objective-c_macos~protocol~ZIMEventHandler#zim-message-deleted' target='_blank'>messageDeleted</a>,
+}
+
+# Delete messages
+
+- - -
+##  Overview
+ZEGOCLOUD's In-app Chat (the ZIM SDK) provides the capability of message management, allowing you to send and receive one-to-one, group, in-room messages, query message history, delete messages, and more. With the message management feature, you can meet different requirements of various scenarios such as social entertainment, online shopping, online education, interactive live streaming, and more. 
+
+This document describes how to delete the specified messages in a specified session, or delete all the messages in a specified session.
+
+
+## Implementation process
+
+The ZIM SDK supports deleting specific messages in a conversation or deleting all messages in a conversation. Deleting messages can be divided into "delete local message records" and "delete server message records". Developers can use the {getPlatformData(props,ZIMMessageDeleteConfigMap)} object to set advanced properties for deleting messages.
+
+Taking the example of client A deleting certain messages or all messages with client B:
+
+<Frame width="512" height="auto" caption=""><img src="https://storage.zego.im/sdk-doc/Pics/in_app_chat/deleteMessage.png" /></Frame>
+
+
+## Delete the specified messages
+
+The following process shows how Client A deletes the specified messages with Client B:
+
+1. Client A and Client B log in to the ZIM SDK to send and receive messages to and from each other.
+2. When Client A wants to delete the specified messages with Client B:
+    1. Client A logs in to the ZIM SDK first.
+    2. Client A calls the {getPlatformData(props,deleteMessagesMap)}method and pass the `messageList` and `config` parameters.
+    3. Client A receives the results through the callback {getPlatformData(props,ZIMMessageDeleteConfigMap)}.
+
+
+
+
+:::if{props.platform=undefined}
+<CodeGroup>
+```java SampleCode
+// Delete the specified messages.
+String conversationID = "xxxx";
+ArrayList<ZIMMessage> deleteMessageList = new ArrayList();
+
+ZIMMessageDeleteConfig config = new ZIMMessageDeleteConfig();
+config.isAlsoDeleteServerMessage = false;
+
+zim.deleteMessages(deleteMessageList, conversationID, ZIMConversationType.Peer, config, new ZIMMessageDeletedCallback() {
+    @Override
+    public void onMessageDeleted(ZIMError error) {
+
+    }
+});
+```
+</CodeGroup>
+:::
+:::if{props.platform="iOS|mac"}
+<CodeGroup>
+```objc SampleCode
+// Delete the specified messages.
+NSMutableArray *deleteMessageList = [[NSMutableArray alloc] init];
+ZIMMessageDeleteConfig *config = [[ZIMMessageDeleteConfig alloc] init];
+// Used to determine whether to delete messages from the server.
+config.isAlsoDeleteServerMessage = true;
+[self.zim deleteMessages:messageList conversationID:conversationID conversationType:conversationType config:config callback:^(NSString * _Nonnull conversationID, ZIMConversationType conversationType, ZIMError * _Nonnull errorInfo) {
+    // You can listen for the callback to check whether the messages are deleted successfully. 
+}];
+```
+</CodeGroup>
+:::
+:::if{props.platform="window"}
+<CodeGroup>
+```cpp SampleCode
+// Delete the specified messages.
+std::vector<std::shared_ptr<ZIMMessage>> messageList;
+zim::ZIMMessageDeleteConfig config;
+// Used to determine whether to delete messages from the server.
+config.isAlsoDeleteServerMessage = true;
+zim_->deleteMessages(messageList,"conversationID",zim::ZIMConversationTypePeer,config,callback);
+```
+</CodeGroup>
+:::
+:::if{props.platform="Flutter"}
+<CodeGroup>
+```dart SampleCode
+// Delete specific messages in a conversation
+String conversationID = 'xxxx';
+List<ZIMMessage> messageList = [];
+ZIMMessageDeleteConfig config = ZIMMessageDeleteConfig();
+config.isAlsoDeleteServerMessage = false;
+await ZIM
+    .getInstance()
+    !.deleteMessages(
+        messageList, conversationID, ZIMConversationType.peer, config)
+    .then((value) => {})
+    .catchError((onError) {});
+```
+
+</CodeGroup>
+:::
+:::if{props.platform="Web"}
+<CodeGroup>
+```typescript SampleCode
+// Delete the specified message of the conversation
+
+const deleteMessageList: ZIMMessage[] = [];
+const conversationID = '';
+const conversationType = 0;
+const config: ZIMMessageDeleteConfig = { isAlsoDeleteServerMessage: false };
+
+zim.deleteMessages(deleteMessageList, conversationID, conversationType, config)
+    .then(function ({ conversationID, conversationType }) {
+        // Operation successful.
+    })
+    .catch(function (err) {
+        // Operation failed.
+    });
+```
+</CodeGroup>
+:::
+
+## Delete all messages of the specified session
+
+The following process shows how Client A deletes all messages with Client B:
+
+1. Client A and Client B log in to the ZIM SDK to send and receive messages to and from each other.
+2. When Client A wants to delete all messages with Client B:
+    1. Client A logs in to the ZIM SDK first.
+    2. Client A calls the {getPlatformData(props,deleteAllMessageMap)} method and pass the `conversationID`, `conversationType`, and `config` parameters.
+    3. Client A receives the results through the callback {getPlatformData(props,ZIMMessageDeletedCallbackMap)}.
+
+
+:::if{props.platform=undefined}
+<CodeGroup>
+```java 
+// Delete all messages of the specified session.
+String conversationID = "xxxx";
+
+ZIMMessageDeleteConfig config = new ZIMMessageDeleteConfig();
+config.isAlsoDeleteServerMessage = false;
+
+zim.deleteAllMessage(conversationID, ZIMConversationType.Peer, config, new ZIMMessageDeletedCallback() {
+    @Override
+    public void onMessageDeleted(ZIMError error) {
+
+    }
+});
+```
+</CodeGroup>
+
+:::
+:::if{props.platform="iOS|mac"}
+<CodeGroup>
+```objc SampleCode
+// Delete all messages of the specified session.
+NSMutableArray *deleteMessageList = [[NSMutableArray alloc] init];
+ZIMMessageDeleteConfig *config = [[ZIMMessageDeleteConfig alloc] init];
+//Used to determine whether to delete messages from the server.
+config.isAlsoDeleteServerMessage = true;
+
+[self.zim deleteAllMessageByConversationID:conversationID conversationType:conversationType config:config callback:^(NSString * _Nonnull conversationID, ZIMConversationType conversationType, ZIMError * _Nonnull errorInfo) {
+     // You can listen for the callback to check whether the messages are deleted successfully.   
+    }];
+```
+</CodeGroup>
+:::
+:::if{props.platform="window"}
+<CodeGroup>
+```cpp SampleCode
+//Used to determine whether to delete messages from the server.
+ZIMMessageDeleteConfig config;
+config.isAlsoDeleteServerMessage = true;
+	 
+zim_->deleteAllMessage("converastionID",zim::ZIMConversationTypePeer,config,callback);
+```
+
+</CodeGroup>
+:::
+:::if{props.platform="Flutter"}
+<CodeGroup>
+```dart SampleCode
+// Delete all messages in the specified conversation
+String conversationID = "xxxx";
+
+ZIMMessageDeleteConfig config = ZIMMessageDeleteConfig();
+config.isAlsoDeleteServerMessage = false;
+
+await ZIM
+    .getInstance()
+    !.deleteAllMessage(conversationID, ZIMConversationType.peer, config)
+    .then((value) => {})
+    .catchError((onError) {});
+```
+
+</CodeGroup>
+:::
+:::if{props.platform="Web"}
+<CodeGroup>
+```typescript SampleCode
+
+// Delete all messages of the specified session.
+const conversationID = '';
+const conversationType = 0;
+const config: ZIMMessageDeleteConfig = { isAlsoDeleteServerMessage: true };
+
+zim.deleteAllMessage(conversationID, conversationType, config)
+    .then(function ({ conversationID, conversationType }) {
+        // Operation successful.
+    })
+    .catch(function (err) {
+        // Operation failed.
+    });
+```
+</CodeGroup>
+:::
+
+### Delete all messages
+
+After logging into the ZIM SDK, you can call the {getPlatformData(props,deleteAllConversationMessagesWithConfigMap)}  method and pass the {getPlatformData(props,ZIMMessageDeleteConfigMap)} parameter to configure whether to delete messages stored on the server. This will delete all messages in one-on-one and group conversations.
+
+:::if{props.platform=undefined}
+The result of the deletion operation will be returned through the {getPlatformData(props,ZIMConversationMessagesAllDeletedCallbackMap)}  callback interface. Additionally, the client will also receive a notification for {getPlatformData(props,messageDeletedMap)}.
+:::
+:::if{props.platform="window"}
+The result of the deletion operation will be returned through the {getPlatformData(props,ZIMConversationMessagesAllDeletedCallbackMap)}  callback interface. Additionally, the client will also receive a notification for {getPlatformData(props,messageDeletedMap)}.
+:::
+:::if{props.platform="iOS"}
+The result of the deletion operation will be returned through the {getPlatformData(props,ZIMConversationMessagesAllDeletedCallbackMap)}  callback interface. Additionally, the client will also receive a notification for {getPlatformData(props,messageDeletedMap)}.
+:::
+:::if{props.platform="mac"}
+The result of the deletion operation will be returned through the {getPlatformData(props,ZIMConversationMessagesAllDeletedCallbackMap)}  callback interface. Additionally, the client will also receive a notification for {getPlatformData(props,messageDeletedMap)}.
+:::
+
+
+After clearing all messages in all conversations:
+- If you want to keep the existing conversation list and update the `lastMessage` displayed in the conversation list to be empty, please [Pull the conversation list](./../Conversation/Get%20the%20conversation%20list.mdx).
+- If you want to clear the existing conversation list, please [Delete all conversations](./../Conversation/Get%20the%20conversation%20list.mdx).
+
+:::if{props.platform=undefined}
+```java
+//Delete all messages in all conversations
+
+// Set whether to delete messages stored on the server
+ZIMMessageDeleteConfig config = new ZIMMessageDeleteConfig();
+config.isAlsoDeleteServerMessage = true;
+
+zim.deleteAllConversationMessages(config, new ZIMConversationMessagesAllDeletedCallback() {
+    @Override
+    public void onConversationMessagesAllDeleted(ZIMError error) {
+        // Developers can use this callback to monitor whether the message is deleted successfully.
+    }
+});
+
+```
+
+:::
+:::if{props.platform="mac"}
+<CodeGroup>
+```objc 
+// Delete all messages in all conversations
+
+// et whether to delete server messages
+ZIMMessageDeleteConfig *config = [[ZIMMessageDeleteConfig alloc] init];
+// Whether to delete server messages
+config.isAlsoDeleteServerMessage = true;
+
+[self.zim deleteAllConversationMessagesWithConfig:config callback:^(ZIMError * _Nonnull errorInfo) {
+     // Developers can use this callback to listen for successful message deletion.   
+    }];
+```
+</CodeGroup>
+:::
+:::if{props.platform="iOS"}
+<CodeGroup>
+```objc 
+// Delete all messages in all conversations
+
+// et whether to delete server messages
+ZIMMessageDeleteConfig *config = [[ZIMMessageDeleteConfig alloc] init];
+// Whether to delete server messages
+config.isAlsoDeleteServerMessage = true;
+
+[self.zim deleteAllConversationMessagesWithConfig:config callback:^(ZIMError * _Nonnull errorInfo) {
+     // Developers can use this callback to listen for successful message deletion.   
+    }];
+```
+</CodeGroup>
+:::
+:::if{props.platform="window"}
+<CodeGroup>
+```cpp
+// Delete all messages in all conversations
+
+// Set whether to delete messages stored on the server
+zim::ZIMMessageDeleteConfig config;
+config.isAlsoDeleteServerMessage = true;
+
+zim::ZIM::getInstance()->deleteAllConversationMessages(config, [=](const zim::ZIMError& errorInfo) {
+    // Result of deleting messages
+    if (errorInfo.code == zim::ZIM_ERROR_CODE_SUCCESS) {
+        // Business logic after deletion
+    }
+    else {
+        // Please check the error code document for solutions
+    }
+    });
+```
+
+</CodeGroup>
+:::
+:::if{props.platform="Flutter"}
+<CodeGroup>
+```dart
+// Delete all messages in conversations
+
+// Set whether to delete messages stored on the server
+ZIMMessageDeleteConfig config = ZIMMessageDeleteConfig();
+config.isAlsoDeleteServerMessage = false;
+
+await ZIM
+    .getInstance()
+    !.deleteAllConversationMessages(config)
+    .then((value) => {})
+    .catchError((onError) {});
+```
+</CodeGroup>
+:::
+:::if{props.platform="Web"}
+```typescript
+// Delete all messages in all conversations
+
+// Set whether to delete messages stored on the server
+const config: ZIMMessageDeleteConfig = {
+  isAlsoDeleteServerMessage: true
+}
+
+zim.deleteAllConversationMessages(config)
+.then(function ({ conversationID, conversationType }) {
+  // Operation successful.
+})
+.catch(function (err) {
+// Operation failed.
+```
+:::

@@ -1,0 +1,134 @@
+# API
+
+## ZegoUIKitPrebuiltCallService
+
+### init
+
+You must call this method as soon as the user logs in (or re-logs in, auto-logs in) to your app.
+
+<CodeGroup>
+```js Prototype
+/**
+ * Initialization of call service
+ * @param {number} appID - Your appID
+ * @param {string} appSign - Your appSign
+ * @param {string} userID - User unique identification
+ * @param {string} userName - userName
+ * @param {Array} plugins - ZIM and ZPNs
+ * @param {Map} config - CallInvitation personalized configuration
+ */
+init(appID, appSign, userID, userName, plugins, config = {})
+```
+
+```js Example
+import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
+
+ZegoUIKitPrebuiltCallService.init(
+    Your_APPID,
+    Your_APPSIGN,
+    Your_UserID,
+    Your_UserName,
+    [ZIM, ZPNs]
+    {}
+    );
+```
+</CodeGroup>
+
+
+### uninit
+
+Should be used in pairs with the `init` API.
+
+<CodeGroup>
+```js Prototype
+/**
+* Deinitialize call service
+*/
+uninit()
+```
+
+```js Example
+import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
+
+ZegoUIKitPrebuiltCallService.uninit();
+```
+</CodeGroup>
+
+
+### useSystemCallingUI
+
+If you want to use the system call UI, you must call this method in `index.js`.
+
+<CodeGroup>
+```js Prototype
+/**
+* Use system call UI.
+* @param {Array} plugins - ZIM and ZPNs
+*/
+useSystemCallingUI(plugins)
+```
+
+```js Example
+import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
+
+ZegoUIKitPrebuiltCallService.useSystemCallingUI([ZIM, ZPNs]);
+```
+</CodeGroup>
+
+
+### hangUp
+
+If you want to hang up the call, you can call this method.
+
+<CodeGroup>
+```js Prototype
+/**
+* Hang up current call.
+* @param {boolean} showConfirmation - If show confirmation dialog.
+*/
+hangUp(showConfirmation = false)
+```
+
+```js Example
+import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
+
+ZegoUIKitPrebuiltCallService.hangUp();
+```
+</CodeGroup>
+
+
+### sendCallInvitation
+
+You can call this method to send a call invitation.
+
+<CodeGroup>
+```js Prototype
+/**
+* Send call Invitation.
+* @param {Array} invitees - The invitee users.
+* @param {boolean} isVideoCall - Is video call or voice call.
+* @param {object} navigation - Use to navigate to other page.
+* @param {Map} options - Call invitation options.
+*/
+sendCallInvitation(invitees, isVideoCall, navigation, options)
+```
+
+```js Example
+import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
+
+const invitees = [{'userID': '123', 'userName': 'name'}];
+const isVideoCall = true;
+const navigation = props.navigation;
+const options = {
+  resourceID: '',
+  timeout: 60,
+  notificationTitle: '',
+  notificationMessage: '',
+  callID: '',
+  customData: '',
+  callName: '',
+  showWaitingPageWhenGroupCall: false,
+}
+ZegoUIKitPrebuiltCallService.sendCallInvitation(invitees, isVideoCall, navigation, options);
+```
+</CodeGroup>

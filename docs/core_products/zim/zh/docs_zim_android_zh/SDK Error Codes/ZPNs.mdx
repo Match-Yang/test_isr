@@ -1,0 +1,15 @@
+# ZPNs 错误码
+
+调用 ZPNs 的接口后，如果返回结果中存在 `errorCode` 字段，则表示该接口调用异常。示例代码如下：
+
+```java
+@Override
+protected void onRegistered(Context context, ZPNsRegisterMessage message) {
+    message.getErrorCode();
+    message.getMsg();
+}
+```
+
+import Content from '/core_products/zim/zh/snippets/ZPNsAndroidErrorCode.mdx'
+
+<Content />
